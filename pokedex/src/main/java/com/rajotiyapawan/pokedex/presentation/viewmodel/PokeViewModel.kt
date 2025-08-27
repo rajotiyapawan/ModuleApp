@@ -1,17 +1,17 @@
-package com.rajotiyapawan.pokedex
+package com.rajotiyapawan.pokedex.presentation.viewmodel
 
-import android.graphics.Rect
 import android.util.Log
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rajotiyapawan.network.ApiResponse
 import com.rajotiyapawan.network.NetworkRepository
-import com.rajotiyapawan.network.POKE_BaseUrl
+import com.rajotiyapawan.pokedex.data.repository.PokemonRepositoryImpl
+import com.rajotiyapawan.pokedex.domain.model.RequestModel
+import com.rajotiyapawan.pokedex.domain.usecase.GetPokemonListUseCase
 import com.rajotiyapawan.pokedex.model.AbilityEffect
 import com.rajotiyapawan.pokedex.model.NameItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
@@ -35,17 +35,24 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-class PokeViewModel : ViewModel() {
+class PokeViewModel(
+    private val getPokemonListUseCase: GetPokemonListUseCase
+) : ViewModel() {
+
+    companion object {
+        val factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val getPokemonListUseCase = GetPokemonListUseCase(PokemonRepositoryImpl())
+                return@initializer PokeViewModel(getPokemonListUseCase)
+            }
+        }
+    }
 
     private var _userEvent = MutableSharedFlow<PokedexUserEvent>()
     val userEvent = _userEvent
 
     private var _pokemonList: MutableStateFlow<UiState<PokemonListData>> = MutableStateFlow(UiState.Idle)
     val pokemonList = _pokemonList.asStateFlow()
-
-    // details for animation
-    var selectedItemBounds by mutableStateOf<Rect?>(null)
-    var selectedItemOffset by mutableStateOf(Offset.Zero)
 
     // Cache detail per Pokémon name
     private val _pokemonDetails = mutableStateMapOf<String, PokemonBasicInfo>()
@@ -62,6 +69,7 @@ class PokeViewModel : ViewModel() {
 
     private var _searchResults = MutableStateFlow<List<NameItem>>(emptyList())
     val searchResults = _searchResults.asStateFlow()
+
     init {
         getPokemonList()
         initializeSearch()
@@ -117,13 +125,15 @@ class PokeViewModel : ViewModel() {
     private fun getPokemonList() {
         viewModelScope.launch {
             _pokemonList.value = UiState.Loading
-            when (val response = NetworkRepository.get<PokemonListData>("${POKE_BaseUrl}pokemon?offset=0&limit=2000")) {
-                is ApiResponse.Success -> {
-                    _pokemonList.value = UiState.Success(response.data)
-                    _searchResults.value = response.data.results ?: emptyList()
-                }
+            getPokemonListUseCase.invoke(params = RequestModel()).collectLatest {
+                when (it) {
+                    is ApiResponse.Success -> {
+                        _pokemonList.value = UiState.Success(it.data)
+                        _searchResults.value = it.data.results ?: emptyList()
+                    }
 
-                is ApiResponse.Error -> {}
+                    is ApiResponse.Error -> {}
+                }
             }
         }
     }
@@ -148,6 +158,7 @@ class PokeViewModel : ViewModel() {
             }
         }
     }
+
     fun fetchBasicDetailByName(name: String?) {
         if (name == null) return
         if (_pokemonDetails.containsKey(name)) return // already fetched
@@ -170,7 +181,7 @@ class PokeViewModel : ViewModel() {
         }
     }
 
-    private var _aboutData = MutableStateFlow(PokemonAbout.init())
+    private var _aboutData = MutableStateFlow(PokemonAbout.Companion.init())
     val aboutData get() = _aboutData
     fun fetchPokemonAbout(item: NameItem?) {
         viewModelScope.launch {
@@ -216,10 +227,10 @@ class PokeViewModel : ViewModel() {
                 item?.name?.let { name ->
                     _abilityDetails[name] = AbilityEffect(
                         effect = detail.effect_entries
-                            .firstOrNull { it.language.name == "en" && it.effect.isNotBlank()}
+                            .firstOrNull { it.language.name == "en" && it.effect.isNotBlank() }
                             ?.effect ?: "",
                         short_effect = detail.effect_entries
-                            .firstOrNull { it.language.name == "en" && it.short_effect.isNotBlank()}
+                            .firstOrNull { it.language.name == "en" && it.short_effect.isNotBlank() }
                             ?.short_effect ?: "",
                         flavor_text = detail.flavor_text_entries
                             .lastOrNull { it.language.name == "en" }

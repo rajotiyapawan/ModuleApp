@@ -1,4 +1,4 @@
-package com.rajotiyapawan.pokedex.ui.detail_screen
+package com.rajotiyapawan.pokedex.presentation.ui.detail_screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

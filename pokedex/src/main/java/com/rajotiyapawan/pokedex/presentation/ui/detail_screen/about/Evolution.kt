@@ -1,4 +1,4 @@
-package com.rajotiyapawan.pokedex.ui.detail_screen.about
+package com.rajotiyapawan.pokedex.presentation.ui.detail_screen.about
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -18,10 +18,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.rajotiyapawan.pokedex.PokeViewModel
 import com.rajotiyapawan.pokedex.model.NameItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
-import com.rajotiyapawan.pokedex.ui.detail_screen.DetailCardWithTitle
+import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
+import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.capitalize
 import com.rajotiyapawan.pokedex.utility.noRippleClick
 

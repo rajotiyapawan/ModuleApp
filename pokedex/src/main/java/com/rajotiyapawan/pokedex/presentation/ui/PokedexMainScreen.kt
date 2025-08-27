@@ -1,4 +1,4 @@
-package com.rajotiyapawan.pokedex.ui
+package com.rajotiyapawan.pokedex.presentation.ui
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -48,9 +48,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size
-import com.rajotiyapawan.pokedex.PokeViewModel
 import com.rajotiyapawan.pokedex.model.NameItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
+import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.UiState
 import com.rajotiyapawan.pokedex.utility.capitalize
 import com.rajotiyapawan.pokedex.utility.getFontFamily

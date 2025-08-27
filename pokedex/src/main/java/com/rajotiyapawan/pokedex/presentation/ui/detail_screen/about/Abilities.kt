@@ -1,4 +1,4 @@
-package com.rajotiyapawan.pokedex.ui.detail_screen.about
+package com.rajotiyapawan.pokedex.presentation.ui.detail_screen.about
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,11 +33,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rajotiyapawan.pokedex.PokeViewModel
 import com.rajotiyapawan.pokedex.R
 import com.rajotiyapawan.pokedex.model.Abilities
 import com.rajotiyapawan.pokedex.model.AbilityEffect
-import com.rajotiyapawan.pokedex.ui.detail_screen.DetailCardWithTitle
+import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
+import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.capitalize
 import com.rajotiyapawan.pokedex.utility.getFontFamily
 import com.rajotiyapawan.pokedex.utility.noRippleClick

@@ -22,14 +22,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.rajotiyapawan.pokedex.model.NameItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
-import com.rajotiyapawan.pokedex.ui.PokedexMainScreen
-import com.rajotiyapawan.pokedex.ui.PokemonDetailScreen
-import com.rajotiyapawan.pokedex.ui.theme.ModuleActivityTheme
+import com.rajotiyapawan.pokedex.presentation.ui.PokedexMainScreen
+import com.rajotiyapawan.pokedex.presentation.ui.PokemonDetailScreen
+import com.rajotiyapawan.pokedex.presentation.ui.theme.ModuleActivityTheme
+import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 class PokedexMainActivity : ComponentActivity() {
 
-    private val viewModel: PokeViewModel by viewModels()
+    private val viewModel: PokeViewModel by viewModels { PokeViewModel.factory }
 
     companion object {
         fun launchPokedex(context: Context) {

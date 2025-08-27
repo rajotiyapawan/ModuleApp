@@ -1,4 +1,4 @@
-package com.rajotiyapawan.pokedex.ui.detail_screen.about
+package com.rajotiyapawan.pokedex.presentation.ui.detail_screen.about
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,8 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rajotiyapawan.pokedex.PokeViewModel
-import com.rajotiyapawan.pokedex.ui.detail_screen.DetailCardWithTitle
+import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
+import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.capitalize
 import com.rajotiyapawan.pokedex.utility.getFontFamily
 import com.rajotiyapawan.pokedex.utility.noRippleClick

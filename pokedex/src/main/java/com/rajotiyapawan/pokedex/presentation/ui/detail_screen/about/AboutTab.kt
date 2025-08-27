@@ -1,12 +1,12 @@
-package com.rajotiyapawan.pokedex.ui.detail_screen.about
+package com.rajotiyapawan.pokedex.presentation.ui.detail_screen.about
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.rajotiyapawan.pokedex.PokeViewModel
 import com.rajotiyapawan.pokedex.model.PokemonData
+import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 
 fun LazyListScope.aboutTabUI(modifier: Modifier = Modifier, viewModel: PokeViewModel, data: PokemonData, typeColors: List<Color>) {
     item {
