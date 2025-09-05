@@ -256,7 +256,7 @@ private fun PokemonListItem(
         }
         Column(Modifier.padding(start = 8.dp)) {
             Text((item.name ?: "").capitalize(), fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 18.sp)
-            Text(text = detail?.types?.joinToString(", ", transform = { it.name.capitalize() }) ?: "")
+            Text(text = detail?.types?.joinToString(", ", transform = { it.name.lowercase().capitalize() }) ?: "")
         }
         val id = detail?.id ?: 0
         val formatted = if (id < 1000) {
