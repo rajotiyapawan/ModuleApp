@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size
-import com.rajotiyapawan.pokedex.model.NameItem
+import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.UiState
@@ -166,7 +166,12 @@ private fun PokemonListUI(modifier: Modifier = Modifier, viewModel: PokeViewMode
 }
 
 @Composable
-private fun PokemonListItem(modifier: Modifier = Modifier, item: NameItem, viewModel: PokeViewModel, itemSelected: () -> Unit) {
+private fun PokemonListItem(
+    modifier: Modifier = Modifier,
+    item: NameUrlItem,
+    viewModel: PokeViewModel,
+    itemSelected: () -> Unit
+) {
     val detail = viewModel.pokemonDetails[item.name]
     val width = LocalConfiguration.current.screenWidthDp
     val context = LocalContext.current
@@ -236,7 +241,7 @@ private fun PokemonListItem(modifier: Modifier = Modifier, item: NameItem, viewM
         }
         Column(Modifier.padding(start = 8.dp)) {
             Text((item.name ?: "").capitalize(), fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 18.sp)
-            Text(text = detail?.types?.joinToString(", ", transform = { it.capitalize() }) ?: "")
+            Text(text = detail?.types?.joinToString(", ", transform = { it.name.capitalize() }) ?: "")
         }
         val id = detail?.id ?: 0
         val formatted = if (id < 1000) {

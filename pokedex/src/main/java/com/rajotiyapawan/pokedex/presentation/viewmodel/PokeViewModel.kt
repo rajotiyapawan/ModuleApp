@@ -10,21 +10,24 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rajotiyapawan.network.ApiResponse
 import com.rajotiyapawan.network.NetworkRepository
 import com.rajotiyapawan.pokedex.data.repository.PokemonRepositoryImpl
+import com.rajotiyapawan.pokedex.domain.model.AbilityDetails.AbilityEffect
+import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
+import com.rajotiyapawan.pokedex.domain.model.PokemonBasicInfo
+import com.rajotiyapawan.pokedex.domain.model.PokemonData
 import com.rajotiyapawan.pokedex.domain.model.RequestModel
+import com.rajotiyapawan.pokedex.domain.usecase.GetAbilityDetailsUseCase
+import com.rajotiyapawan.pokedex.domain.usecase.GetPokemonBasicInfoUseCase
+import com.rajotiyapawan.pokedex.domain.usecase.GetPokemonDetailsUseCase
 import com.rajotiyapawan.pokedex.domain.usecase.GetPokemonListUseCase
-import com.rajotiyapawan.pokedex.model.AbilityEffect
-import com.rajotiyapawan.pokedex.model.NameItem
+import com.rajotiyapawan.pokedex.domain.usecase.GetPokemonSpeciesDataUseCase
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
-import com.rajotiyapawan.pokedex.model.PokemonAbilityDto
-import com.rajotiyapawan.pokedex.model.PokemonAbout
-import com.rajotiyapawan.pokedex.model.PokemonAboutDto
-import com.rajotiyapawan.pokedex.model.PokemonBasicInfo
-import com.rajotiyapawan.pokedex.model.PokemonData
 import com.rajotiyapawan.pokedex.model.PokemonEvolution
 import com.rajotiyapawan.pokedex.model.PokemonEvolutionDto
 import com.rajotiyapawan.pokedex.model.PokemonListData
+import com.rajotiyapawan.pokedex.model.PokemonSpeciesData
 import com.rajotiyapawan.pokedex.model.toChain
 import com.rajotiyapawan.pokedex.utility.UiState
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,14 +39,28 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class PokeViewModel(
-    private val getPokemonListUseCase: GetPokemonListUseCase
+    private val getPokemonListUseCase: GetPokemonListUseCase,
+    private val getPokemonDetailsUseCase: GetPokemonDetailsUseCase,
+    private val getPokemonSpeciesDataUseCase: GetPokemonSpeciesDataUseCase,
+    private val getPokemonBasicInfoUseCase: GetPokemonBasicInfoUseCase,
+    private val getAbilityDetailsUseCase: GetAbilityDetailsUseCase
 ) : ViewModel() {
 
     companion object {
         val factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val getPokemonListUseCase = GetPokemonListUseCase(PokemonRepositoryImpl())
-                return@initializer PokeViewModel(getPokemonListUseCase)
+                val pokeRepo = PokemonRepositoryImpl()
+                val getPokemonListUseCase = GetPokemonListUseCase(pokeRepo)
+                val getPokemonDetailsUseCase = GetPokemonDetailsUseCase(pokeRepo)
+                val getPokemonSpeciesDataUseCase = GetPokemonSpeciesDataUseCase(pokeRepo)
+                val getPokemonBasicInfoUseCase = GetPokemonBasicInfoUseCase(pokeRepo)
+                val getAbilityDetailsUseCase = GetAbilityDetailsUseCase(pokeRepo)
+                return@initializer PokeViewModel(
+                    getPokemonListUseCase,
+                    getPokemonDetailsUseCase,
+                    getPokemonSpeciesDataUseCase,
+                    getPokemonBasicInfoUseCase, getAbilityDetailsUseCase
+                )
             }
         }
     }
@@ -67,7 +84,7 @@ class PokeViewModel(
         _query.value = query
     }
 
-    private var _searchResults = MutableStateFlow<List<NameItem>>(emptyList())
+    private var _searchResults = MutableStateFlow<List<NameUrlItem>>(emptyList())
     val searchResults = _searchResults.asStateFlow()
 
     init {
@@ -82,6 +99,7 @@ class PokeViewModel(
         }
     }
 
+    @OptIn(FlowPreview::class)
     private fun initializeSearch() {
         viewModelScope.launch {
             _query.debounce(500)
@@ -100,28 +118,7 @@ class PokeViewModel(
         }
     }
 
-    private var _pokemonData = MutableStateFlow<UiState<PokemonData>>(UiState.Idle)
-    val pokemonData = _pokemonData.asStateFlow()
-    fun getPokemonData(item: NameItem) {
-        val name = item.name?.lowercase()
-
-        // Use cached data if available
-        val cached = _pokemonCache[name]
-        if (cached != null) {
-            _pokemonData.value = UiState.Success(cached)
-            return
-        }
-        viewModelScope.launch {
-            when (val response = NetworkRepository.get<PokemonData>("https://pokeapi.co/api/v2/pokemon/${name}")) {
-                is ApiResponse.Error -> {}
-                is ApiResponse.Success<PokemonData> -> {
-                    _pokemonData.value = UiState.Success(response.data)
-                    _pokemonCache[name ?: ""] = response.data
-                }
-            }
-        }
-    }
-
+    // fetch the list of pokemon with names and ids
     private fun getPokemonList() {
         viewModelScope.launch {
             _pokemonList.value = UiState.Loading
@@ -138,76 +135,65 @@ class PokeViewModel(
         }
     }
 
-    fun fetchBasicDetail(item: NameItem?) {
-        if (_pokemonDetails.containsKey(item?.name)) return // already fetched
+    // fetch the details of the selected Pokemon
+    private var _pokemonData = MutableStateFlow<UiState<PokemonData>>(UiState.Idle)
+    val pokemonData = _pokemonData.asStateFlow()
+    fun getPokemonData(item: NameUrlItem) {
+        val name = item.name?.lowercase()
 
+        // Use cached data if available
+        val cached = _pokemonCache[name]
+        if (cached != null) {
+            _pokemonData.value = UiState.Success(cached)
+            return
+        }
         viewModelScope.launch {
-            delay(100L) // Give some time between requests
-            val response = NetworkRepository.get<PokemonData>(item?.url ?: "")
-            if (response is ApiResponse.Success) {
-                val detail = response.data
-                item?.name?.let { name ->
-                    _pokemonDetails[name] = PokemonBasicInfo(
-                        id = detail.id ?: 0,
-                        imageUrl = detail.sprites?.other?.officialArtwork?.frontDefault ?: "",
-                        types = detail.types?.map { it.type?.name ?: "" } ?: listOf()
-                    )
+            getPokemonDetailsUseCase.invoke(params = RequestModel(name = item.name, url = item.url)).collectLatest {
+                when (it) {
+                    is ApiResponse.Error -> {}
+                    is ApiResponse.Success<PokemonData> -> {
+                        _pokemonData.value = UiState.Success(it.data)
+                        _pokemonCache[name ?: ""] = it.data
+                    }
                 }
-            } else if (response is ApiResponse.Error) {
-                Log.e("FetchError", "Failed for ${item?.name}: ${response.message}")
             }
         }
     }
 
-    fun fetchBasicDetailByName(name: String?) {
-        if (name == null) return
-        if (_pokemonDetails.containsKey(name)) return // already fetched
+    fun fetchBasicDetail(item: NameUrlItem?) {
+        if (item?.name.isNullOrEmpty() && item?.url.isNullOrEmpty()) return
+        if (_pokemonDetails.containsKey(item.name)) return // already fetched
 
         viewModelScope.launch {
             delay(100L) // Give some time between requests
-            val response = NetworkRepository.get<PokemonData>("https://pokeapi.co/api/v2/pokemon/$name")
-            if (response is ApiResponse.Success) {
-                val detail = response.data
-                name?.let { name ->
-                    _pokemonDetails[name] = PokemonBasicInfo(
-                        id = detail.id ?: 0,
-                        imageUrl = detail.sprites?.other?.officialArtwork?.frontDefault ?: "",
-                        types = detail.types?.map { it.type?.name ?: "" } ?: listOf()
-                    )
+            getPokemonBasicInfoUseCase.invoke(RequestModel(name = item.name, url = item.url)).collectLatest {
+                when (it) {
+                    is ApiResponse.Error -> {
+                        Log.e("FetchError", "Failed for ${item.name}: ${it.message}")
+                    }
+
+                    is ApiResponse.Success -> {
+                        item.name?.let { name ->
+                            _pokemonDetails[name] = it.data
+                        }
+                    }
                 }
-            } else if (response is ApiResponse.Error) {
-                Log.e("FetchError", "Failed for ${name}: ${response.message}")
             }
         }
     }
 
-    private var _aboutData = MutableStateFlow(PokemonAbout.Companion.init())
+    private var _aboutData = MutableStateFlow(PokemonSpeciesData.Companion.init())
     val aboutData get() = _aboutData
-    fun fetchPokemonAbout(item: NameItem?) {
+    fun fetchPokemonAbout(item: NameUrlItem?) {
         viewModelScope.launch {
             delay(100L) // Give some time between requests
-            val response = NetworkRepository.get<PokemonAboutDto>(item?.url ?: "")
-            if (response is ApiResponse.Success) {
-                val detail = response.data
-                val femalePercentage = (detail.gender_rate / 8.0) * 100
-                _aboutData.value = PokemonAbout(
-                    flavourText = detail.flavor_text_entries
-                        .firstOrNull { it.language.name == "en" && it.version.name == "ruby" }
-                        ?.flavor_text
-                        ?.replace("\n", " ") ?: "",
-                    genus = detail.genera
-                        .firstOrNull { it.language.name == "en" }
-                        ?.genus ?: "",
-                    growthRate = detail.growth_rate.name ?: "",
-                    femalePercentage = femalePercentage,
-                    malePercentage = 100 - femalePercentage,
-                    baseFriendship = detail.base_happiness,
-                    hatchCounter = detail.hatch_counter,
-                    eggGroups = detail.egg_groups,
-                    evolutionChain = detail.evolution_chain
-                )
-            } else if (response is ApiResponse.Error) {
-                Log.e("FetchError", "Failed for ${item?.name}: ${response.message}")
+            getPokemonSpeciesDataUseCase.invoke(RequestModel(name = item?.name, url = item?.url)).collectLatest {
+                when (it) {
+                    is ApiResponse.Error -> Log.e("FetchError", "Failed for ${item?.name}: ${it.message}")
+                    is ApiResponse.Success<PokemonSpeciesData> -> {
+                        _aboutData.value = it.data
+                    }
+                }
             }
         }
     }
@@ -216,31 +202,33 @@ class PokeViewModel(
     private val _abilityDetails = mutableStateMapOf<String, AbilityEffect>()
     val abilityDetails: Map<String, AbilityEffect> get() = _abilityDetails
 
-    fun getAbilityEffect(item: NameItem?) {
+    fun getAbilityEffect(item: NameUrlItem?) {
         if (_abilityDetails.containsKey(item?.name)) return // already fetched
 
         viewModelScope.launch {
             delay(100L) // Give some time between requests
-            val response = NetworkRepository.get<PokemonAbilityDto>(item?.url ?: "")
-            if (response is ApiResponse.Success) {
-                val detail = response.data
-                item?.name?.let { name ->
-                    _abilityDetails[name] = AbilityEffect(
-                        effect = detail.effect_entries
-                            .firstOrNull { it.language.name == "en" && it.effect.isNotBlank() }
-                            ?.effect ?: "",
-                        short_effect = detail.effect_entries
-                            .firstOrNull { it.language.name == "en" && it.short_effect.isNotBlank() }
-                            ?.short_effect ?: "",
-                        flavor_text = detail.flavor_text_entries
-                            .lastOrNull { it.language.name == "en" }
-                            ?.flavor_text
-                            ?.replace("\n", " ") ?: "",
-                        language = NameItem("", "")
-                    )
+            getAbilityDetailsUseCase.invoke(RequestModel(name = item?.name, url = item?.url)).collectLatest {
+                when (it) {
+                    is ApiResponse.Error -> Log.e("FetchError", "Failed for ${item?.name}: ${it.message}")
+                    is ApiResponse.Success -> {
+                        val detail = it.data
+                        item?.name?.let { name ->
+                            _abilityDetails[name] = AbilityEffect(
+                                effect = detail.effect_entries
+                                    .firstOrNull { it.language?.name == "en" && it.effect.isNotBlank() }
+                                    ?.effect ?: "",
+                                short_effect = detail.effect_entries
+                                    .firstOrNull { it.language?.name == "en" && it.short_effect.isNotBlank() }
+                                    ?.short_effect ?: "",
+                                flavor_text = detail.flavor_text_entries
+                                    .lastOrNull { it.language.name == "en" }
+                                    ?.flavor_text
+                                    ?.replace("\n", " ") ?: "",
+                                language = NameUrlItem("", "")
+                            )
+                        }
+                    }
                 }
-            } else if (response is ApiResponse.Error) {
-                Log.e("FetchError", "Failed for ${item?.name}: ${response.message}")
             }
         }
     }
@@ -248,7 +236,7 @@ class PokeViewModel(
     private val _evolutionChain = MutableStateFlow(PokemonEvolution(null))
     val evolutionChain = _evolutionChain.asStateFlow()
 
-    fun getEvolutionChain(item: NameItem?) {
+    fun getEvolutionChain(item: NameUrlItem?) {
         viewModelScope.launch {
             val response = NetworkRepository.get<PokemonEvolutionDto>(item?.url ?: "")
             if (response is ApiResponse.Success) {
@@ -263,7 +251,7 @@ class PokeViewModel(
     }
 
 
-    fun toggleFavourites(item: NameItem) {
+    fun toggleFavourites(item: NameUrlItem) {
 
     }
 }

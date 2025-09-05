@@ -1,5 +1,7 @@
 package com.rajotiyapawan.pokedex.model
 
+import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
+
 data class PokemonEvolutionDto(
     val baby_trigger_item: Any?,
     val chain: ChainDto?,
@@ -10,7 +12,7 @@ data class ChainDto(
     val evolution_details: List<EvolutionDetail>,
     val evolves_to: List<ChainDto>?,
     val is_baby: Boolean,
-    val species: NameItem
+    val species: NameUrlItem
 )
 
 fun ChainDto.toChain(): Chain {
@@ -38,7 +40,7 @@ data class EvolutionDetail(
     val relative_physical_stats: Any,
     val time_of_day: String,
     val trade_species: Any,
-    val trigger: NameItem,
+    val trigger: NameUrlItem,
     val turn_upside_down: Boolean
 )
 
@@ -48,6 +50,6 @@ data class PokemonEvolution(
 
 data class Chain(
     val evolvesTo: List<Chain>,
-    val species: NameItem,
+    val species: NameUrlItem,
     val evolutionDetails: List<EvolutionDetail>
 )

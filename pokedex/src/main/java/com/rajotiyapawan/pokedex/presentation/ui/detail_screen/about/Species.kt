@@ -19,8 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rajotiyapawan.pokedex.model.PokeTypes
-import com.rajotiyapawan.pokedex.model.PokemonData
+import com.rajotiyapawan.pokedex.domain.model.PokeType
+import com.rajotiyapawan.pokedex.domain.model.PokemonData
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.TypeIcon
@@ -87,13 +87,10 @@ fun AboutSpecies(
 }
 
 @Composable
-private fun AboutPokemonTypes(modifier: Modifier = Modifier, types: ArrayList<PokeTypes>?, color: List<Color>) {
+private fun AboutPokemonTypes(modifier: Modifier = Modifier, types: List<PokeType>?, color: List<Color>) {
     Row(modifier, horizontalArrangement = Arrangement.Center) {
         types?.forEachIndexed { index, type ->
-            TypeIcon(
-                type.type?.name ?: "", Modifier
-                    .padding(horizontal = 4.dp)
-            )
+            TypeIcon(type, Modifier.padding(horizontal = 4.dp))
         }
     }
 }

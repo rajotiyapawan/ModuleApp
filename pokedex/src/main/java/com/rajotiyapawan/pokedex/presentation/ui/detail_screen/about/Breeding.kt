@@ -57,7 +57,7 @@ fun AboutBreeding(modifier: Modifier = Modifier, color: Color, viewModel: PokeVi
                 lineHeight = 13.sp
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                aboutData.eggGroups.forEach {
+                aboutData.eggGroups?.forEach {
                     Row(
                         Modifier
                             .weight(1f)

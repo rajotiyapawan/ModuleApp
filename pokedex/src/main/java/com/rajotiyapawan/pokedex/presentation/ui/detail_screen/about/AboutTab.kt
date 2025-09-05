@@ -5,10 +5,15 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.rajotiyapawan.pokedex.model.PokemonData
+import com.rajotiyapawan.pokedex.domain.model.PokemonData
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 
-fun LazyListScope.aboutTabUI(modifier: Modifier = Modifier, viewModel: PokeViewModel, data: PokemonData, typeColors: List<Color>) {
+fun LazyListScope.aboutTabUI(
+    modifier: Modifier = Modifier,
+    viewModel: PokeViewModel,
+    data: PokemonData,
+    typeColors: List<Color>
+) {
     item {
         AboutSpecies(modifier = modifier, viewModel = viewModel, data = data, color = typeColors)
     }

@@ -34,8 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rajotiyapawan.pokedex.R
-import com.rajotiyapawan.pokedex.model.Abilities
-import com.rajotiyapawan.pokedex.model.AbilityEffect
+import com.rajotiyapawan.pokedex.domain.model.Ability
+import com.rajotiyapawan.pokedex.domain.model.AbilityDetails.AbilityEffect
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.capitalize
@@ -47,7 +47,7 @@ import com.rajotiyapawan.pokedex.utility.noRippleClick
 fun AboutAbilities(
     modifier: Modifier = Modifier,
     color: Color,
-    abilities: ArrayList<Abilities>,
+    abilities: List<Ability>,
     viewModel: PokeViewModel
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -104,7 +104,14 @@ fun AboutAbilities(
 }
 
 @Composable
-private fun AbilityItem(modifier: Modifier = Modifier, abilityName: String, isHidden: Boolean, description: String, color: Color, onInfoClick: () -> Unit) {
+private fun AbilityItem(
+    modifier: Modifier = Modifier,
+    abilityName: String,
+    isHidden: Boolean,
+    description: String,
+    color: Color,
+    onInfoClick: () -> Unit
+) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically

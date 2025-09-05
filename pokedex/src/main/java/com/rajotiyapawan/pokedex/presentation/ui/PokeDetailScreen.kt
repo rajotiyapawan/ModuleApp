@@ -1,6 +1,5 @@
 package com.rajotiyapawan.pokedex.presentation.ui
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -32,8 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
@@ -60,9 +57,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size
-import com.rajotiyapawan.pokedex.model.NameItem
+import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
+import com.rajotiyapawan.pokedex.domain.model.PokemonData
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
-import com.rajotiyapawan.pokedex.model.PokemonData
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.about.aboutTabUI
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.UiState
@@ -78,7 +75,7 @@ enum class PokemonDataTabs {
 }
 
 @Composable
-fun PokemonDetailScreen(modifier: Modifier = Modifier, nameItem: NameItem, viewModel: PokeViewModel) {
+fun PokemonDetailScreen(modifier: Modifier = Modifier, nameItem: NameUrlItem, viewModel: PokeViewModel) {
     // Trigger fetch only when name changes
     LaunchedEffect(nameItem.name) {
         viewModel.getPokemonData(nameItem)
@@ -115,7 +112,7 @@ private fun DetailMainUI(modifier: Modifier = Modifier, viewModel: PokeViewModel
     val width = remember { mutableStateOf(0) }
     val height = LocalConfiguration.current.screenHeightDp
 
-    val typeColors = data.types?.map { getTypeColor(it.type?.name ?: "") } ?: listOf()
+    val typeColors = data.types.map { getTypeColor(it) }
 
     Scaffold { padding ->
         Box(
@@ -125,16 +122,19 @@ private fun DetailMainUI(modifier: Modifier = Modifier, viewModel: PokeViewModel
         ) {
             val selectedTab = remember { mutableStateOf(PokemonDataTabs.About) }
             Box(Modifier.padding(bottom = padding.calculateBottomPadding())) {
-                LazyColumn(modifier = Modifier
+                LazyColumn(
+                    modifier = Modifier
                         .onGloballyPositioned {
                             width.value = it.size.width
                         }, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
                     state = listState
                 ) {
                     item {
-                        DetailTopSection(Modifier
-                            .fillMaxWidth()
-                            .height((height * 0.5f).dp), typeColors, padding, data)
+                        DetailTopSection(
+                            Modifier
+                                .fillMaxWidth()
+                                .height((height * 0.5f).dp), typeColors, padding, data
+                        )
                     }
                     stickyHeader {
                         TabBarRow(
@@ -184,7 +184,7 @@ private fun DetailMainUI(modifier: Modifier = Modifier, viewModel: PokeViewModel
                         Icons.Default.FavoriteBorder, contentDescription = null, modifier = Modifier
                             .padding(8.dp)
                             .noRippleClick {
-                                viewModel.toggleFavourites(NameItem(data.name, ""))
+                                viewModel.toggleFavourites(NameUrlItem(data.name, ""))
                             },
                         tint = if (statusBarColor.value == Color.Transparent) Color.White else Color.Black
                     )
@@ -301,7 +301,7 @@ private fun DetailTopSection(
                     }, contentAlignment = Alignment.Center
             ) {
                 val request = ImageRequest.Builder(context)
-                    .data(data.sprites?.other?.officialArtwork?.frontDefault) // must be the high-res artwork URL
+                    .data(data.imageUrl) // must be the high-res artwork URL
                     .crossfade(true)
                     .size(Size.ORIGINAL) // do not scale down
                     .build()

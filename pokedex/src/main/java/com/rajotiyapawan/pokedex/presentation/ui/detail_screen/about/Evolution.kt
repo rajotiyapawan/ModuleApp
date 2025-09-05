@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.rajotiyapawan.pokedex.model.NameItem
+import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
@@ -80,13 +80,13 @@ fun AboutEvolution(modifier: Modifier = Modifier, color: Color, viewModel: PokeV
 }
 
 @Composable
-private fun EvolvePokemon(modifier: Modifier = Modifier, pokemon: NameItem?, viewModel: PokeViewModel) {
+private fun EvolvePokemon(modifier: Modifier = Modifier, pokemon: NameUrlItem?, viewModel: PokeViewModel) {
     pokemon?.let {
         val detail = viewModel.pokemonDetails[it.name]
         Log.d("Evolution", "Pokemon name = ${it.name} and url = ${it.url}")
         LaunchedEffect(pokemon.name) {
             if (detail == null) {
-                viewModel.fetchBasicDetailByName(it.name)
+                viewModel.fetchBasicDetail(NameUrlItem(name = it.name))
             }
         }
         Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {

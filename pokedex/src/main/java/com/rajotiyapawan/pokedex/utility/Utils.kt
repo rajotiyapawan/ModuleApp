@@ -24,6 +24,7 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.rajotiyapawan.pokedex.R
+import com.rajotiyapawan.pokedex.domain.model.PokeType
 
 val fontProvider = GoogleFont.Provider(
     providerAuthority = "com.google.android.gms.fonts",
@@ -32,7 +33,11 @@ val fontProvider = GoogleFont.Provider(
 )
 val montserratFont = GoogleFont("Lato")
 
-fun getFontFamily(weight: FontWeight = FontWeight.Normal, fontStyle: FontStyle = FontStyle.Normal, font: GoogleFont = montserratFont): FontFamily {
+fun getFontFamily(
+    weight: FontWeight = FontWeight.Normal,
+    fontStyle: FontStyle = FontStyle.Normal,
+    font: GoogleFont = montserratFont
+): FontFamily {
     return FontFamily(Font(googleFont = font, fontProvider, weight = weight, style = fontStyle))
 }
 
@@ -76,26 +81,26 @@ fun ImageFromUrl(modifier: Modifier = Modifier, imageUrl: String, contentScale: 
     )
 }
 
-fun getTypeColor(type: String): Color {
-    return when (type.lowercase()) {
-        "fire" -> Color(0xFFEE8130)
-        "water" -> Color(0xFF6390F0)
-        "grass" -> Color(0xFF7AC74C)
-        "electric" -> Color(0xFFF7D02C)
-        "fighting" -> Color(0xFFC22E28)
-        "psychic" -> Color(0xFFF95587)
-        "dragon" -> Color(0xFF6F35FC)
-        "dark" -> Color(0xFF705746)
-        "fairy" -> Color(0xFFD685AD)
-        "ghost" -> Color(0xFF735797)
-        "poison" -> Color(0xFFA33EA1)
-        "rock" -> Color(0xFFB6A136)
-        "ground" -> Color(0xFFE2BF65)
-        "ice" -> Color(0xFF96D9D6)
-        "bug" -> Color(0xFFA6B91A)
-        "steel" -> Color(0xFFB7B7CE)
-        "normal" -> Color(0xFFA8A77A)
-        else -> Color.LightGray
+fun getTypeColor(type: PokeType): Color {
+    return when (type) {
+        PokeType.FIRE -> Color(0xFFEE8130)
+        PokeType.WATER -> Color(0xFF6390F0)
+        PokeType.GRASS -> Color(0xFF7AC74C)
+        PokeType.ELECTRIC -> Color(0xFFF7D02C)
+        PokeType.FIGHTING -> Color(0xFFC22E28)
+        PokeType.PSYCHIC -> Color(0xFFF95587)
+        PokeType.DRAGON -> Color(0xFF6F35FC)
+        PokeType.DARK -> Color(0xFF705746)
+        PokeType.FAIRY -> Color(0xFFD685AD)
+        PokeType.GHOST -> Color(0xFF735797)
+        PokeType.POISON -> Color(0xFFA33EA1)
+        PokeType.ROCK -> Color(0xFFB6A136)
+        PokeType.GROUND -> Color(0xFFE2BF65)
+        PokeType.ICE -> Color(0xFF96D9D6)
+        PokeType.BUG -> Color(0xFFA6B91A)
+        PokeType.STEEL -> Color(0xFFB7B7CE)
+        PokeType.NORMAL -> Color(0xFFA8A77A)
+        PokeType.FLYING -> Color.LightGray
     }
 }
 
@@ -116,32 +121,31 @@ fun convertWeightToLbs(weightHg: Int): Double {
 }
 
 @DrawableRes
-fun getTypeIconRes(type: String): Int {
-    return when (type.lowercase()) {
-        "fire" -> R.drawable.fire
-        "water" -> R.drawable.water
-        "grass" -> R.drawable.grass
-        "electric" -> R.drawable.electric
-        "psychic" -> R.drawable.psychic
-        "ice" -> R.drawable.ice
-        "dragon" -> R.drawable.dragon
-        "dark" -> R.drawable.dark
-        "fairy" -> R.drawable.fairy
-        "normal" -> R.drawable.normal
-        "fighting" -> R.drawable.fighting
-        "flying" -> R.drawable.flying
-        "poison" -> R.drawable.poison
-        "ground" -> R.drawable.ground
-        "rock" -> R.drawable.rock
-        "bug" -> R.drawable.bug
-        "ghost" -> R.drawable.ghost
-        "steel" -> R.drawable.steel
-        else -> R.drawable.normal // fallback icon
+fun getTypeIconRes(type: PokeType): Int {
+    return when (type) {
+        PokeType.NORMAL -> R.drawable.normal
+        PokeType.FIRE -> R.drawable.fire
+        PokeType.WATER -> R.drawable.water
+        PokeType.GRASS -> R.drawable.grass
+        PokeType.ELECTRIC -> R.drawable.electric
+        PokeType.ICE -> R.drawable.ice
+        PokeType.FIGHTING -> R.drawable.fighting
+        PokeType.POISON -> R.drawable.poison
+        PokeType.GROUND -> R.drawable.ground
+        PokeType.FLYING -> R.drawable.flying
+        PokeType.PSYCHIC -> R.drawable.psychic
+        PokeType.BUG -> R.drawable.bug
+        PokeType.ROCK -> R.drawable.rock
+        PokeType.GHOST -> R.drawable.ghost
+        PokeType.DRAGON -> R.drawable.dragon
+        PokeType.DARK -> R.drawable.dark
+        PokeType.STEEL -> R.drawable.steel
+        PokeType.FAIRY -> R.drawable.fairy
     }
 }
 
 @Composable
-fun TypeIcon(type: String, modifier: Modifier = Modifier) {
+fun TypeIcon(type: PokeType, modifier: Modifier = Modifier) {
     val iconRes = getTypeIconRes(type)
     Image(
         painter = painterResource(id = iconRes),

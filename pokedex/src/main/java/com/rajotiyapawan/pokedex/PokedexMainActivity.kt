@@ -2,10 +2,8 @@ package com.rajotiyapawan.pokedex
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -14,21 +12,19 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.core.graphics.toColorInt
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.rajotiyapawan.pokedex.model.NameItem
+import androidx.navigation.navArgument
+import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
+import com.rajotiyapawan.pokedex.presentation.navigation.Routes
 import com.rajotiyapawan.pokedex.presentation.ui.PokedexMainScreen
 import com.rajotiyapawan.pokedex.presentation.ui.PokemonDetailScreen
 import com.rajotiyapawan.pokedex.presentation.ui.theme.ModuleActivityTheme
@@ -68,8 +64,7 @@ class PokedexMainActivity : ComponentActivity() {
             }
         }
 
-        val startDestination = "main"
-        PrepareNavGraph(modifier, navController, startDestination)
+        PrepareNavGraph(modifier, navController, Routes.Home.route)
     }
 
     @OptIn(ExperimentalAnimationApi::class)
@@ -80,7 +75,7 @@ class PokedexMainActivity : ComponentActivity() {
             modifier = modifier
         ) {
             composable(
-                "main",
+                route = Routes.Home.route,
                 enterTransition = {
                     slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
                 },
@@ -97,7 +92,10 @@ class PokedexMainActivity : ComponentActivity() {
             }
 
             composable(
-                "detail/{pokemon}",
+                route = Routes.Detail.route,
+                arguments = listOf(
+                    navArgument("pokemon") { type = NavType.StringType },
+                ),
                 enterTransition = {
                     slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
                 },
@@ -110,8 +108,8 @@ class PokedexMainActivity : ComponentActivity() {
                 popExitTransition = {
                     slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
                 }) { backStackEntry ->
-                val item = backStackEntry.arguments?.getString("pokemon") ?: return@composable
-                PokemonDetailScreen(Modifier.fillMaxSize(), NameItem(item, ""), viewModel)
+                val pokemon = backStackEntry.arguments?.getString("pokemon") ?: return@composable
+                PokemonDetailScreen(Modifier.fillMaxSize(), NameUrlItem(name = pokemon), viewModel)
             }
 
         }
@@ -120,7 +118,7 @@ class PokedexMainActivity : ComponentActivity() {
     private fun handleUserEvents(navController: NavHostController, event: PokedexUserEvent) {
         when (event) {
             PokedexUserEvent.BackBtnClicked -> navController.popBackStack()
-            is PokedexUserEvent.OpenDetail -> navController.navigate("detail/${event.nameItem.name}")
+            is PokedexUserEvent.OpenDetail -> navController.navigate(Routes.Detail.createRoute(event.poekmon))
         }
     }
 }
