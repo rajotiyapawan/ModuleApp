@@ -15,10 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CircularProgressIndicator
@@ -142,6 +144,19 @@ private fun SearchBar(modifier: Modifier = Modifier, viewModel: PokeViewModel) {
                         )
                     }
                     innerTextField()
+                }
+                if (query.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color.Gray, shape = CircleShape)
+                            .size(30.dp)
+                            .noRippleClick { viewModel.onQueryChanged("") }, contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Outlined.Clear,
+                            contentDescription = null, tint = Color.White
+                        )
+                    }
                 }
             }
         })
