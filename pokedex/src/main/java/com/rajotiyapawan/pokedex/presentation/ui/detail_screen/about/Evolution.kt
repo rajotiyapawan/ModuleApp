@@ -41,42 +41,44 @@ fun AboutEvolution(modifier: Modifier = Modifier, color: Color, currentPokemon: 
     val evolutionChain by viewModel.evolutionChain.collectAsState()
     val firstPokemon = evolutionChain.chain?.species
 
-    DetailCardWithTitle(modifier, "Evolution chain", color) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp)
-                .padding(12.dp)
-        ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                EvolvePokemon(modifier = Modifier.weight(1f), pokemon = firstPokemon, viewModel = viewModel)
-                if (evolutionChain.chain?.evolvesTo?.isNotEmpty() == true) {
-                    val secondPokemon = evolutionChain.chain?.evolvesTo?.get(0)?.species
-                    Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                        EvolvePokemon(modifier = Modifier, pokemon = secondPokemon, viewModel = viewModel)
-                        Text(
-                            "Level ${
-                                evolutionChain.chain?.evolvesTo?.get(0)?.evolutionDetails?.takeIf { it.isNotEmpty() }
-                                    ?.get(0)?.min_level
-                            }",
-                            fontSize = 12.sp,
-                            lineHeight = 13.sp,
-                            fontFamily = getFontFamily()
-                        )
-                    }
-                    if (evolutionChain.chain?.evolvesTo?.get(0)?.evolvesTo?.isNotEmpty() == true) {
-                        val thirdPokemon = evolutionChain.chain?.evolvesTo?.get(0)?.evolvesTo?.get(0)?.species
+    if (evolutionChain.chain != null) {
+        DetailCardWithTitle(modifier, "Evolution chain", color) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp)
+                    .padding(12.dp)
+            ) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    EvolvePokemon(modifier = Modifier.weight(1f), pokemon = firstPokemon, viewModel = viewModel)
+                    if (evolutionChain.chain?.evolvesTo?.isNotEmpty() == true) {
+                        val secondPokemon = evolutionChain.chain?.evolvesTo?.get(0)?.species
                         Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                            EvolvePokemon(modifier = Modifier, pokemon = thirdPokemon, viewModel = viewModel)
+                            EvolvePokemon(modifier = Modifier, pokemon = secondPokemon, viewModel = viewModel)
                             Text(
                                 "Level ${
-                                    evolutionChain.chain?.evolvesTo?.get(0)?.evolvesTo?.get(0)?.evolutionDetails?.takeIf { it.isNotEmpty() }
+                                    evolutionChain.chain?.evolvesTo?.get(0)?.evolutionDetails?.takeIf { it.isNotEmpty() }
                                         ?.get(0)?.min_level
                                 }",
                                 fontSize = 12.sp,
                                 lineHeight = 13.sp,
                                 fontFamily = getFontFamily()
                             )
+                        }
+                        if (evolutionChain.chain?.evolvesTo?.get(0)?.evolvesTo?.isNotEmpty() == true) {
+                            val thirdPokemon = evolutionChain.chain?.evolvesTo?.get(0)?.evolvesTo?.get(0)?.species
+                            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                                EvolvePokemon(modifier = Modifier, pokemon = thirdPokemon, viewModel = viewModel)
+                                Text(
+                                    "Level ${
+                                        evolutionChain.chain?.evolvesTo?.get(0)?.evolvesTo?.get(0)?.evolutionDetails?.takeIf { it.isNotEmpty() }
+                                            ?.get(0)?.min_level
+                                    }",
+                                    fontSize = 12.sp,
+                                    lineHeight = 13.sp,
+                                    fontFamily = getFontFamily()
+                                )
+                            }
                         }
                     }
                 }

@@ -139,6 +139,9 @@ class PokeViewModel(
     private var _pokemonData = MutableStateFlow<UiState<PokemonData>>(UiState.Idle)
     val pokemonData = _pokemonData.asStateFlow()
     fun getPokemonData(item: NameUrlItem) {
+        // clear the stale about data and evolution data
+        _aboutData.value = PokemonSpeciesData.init()
+        _evolutionChain.value = EvolutionChain(null)
         val name = item.name?.lowercase()
 
         // Use cached data if available
