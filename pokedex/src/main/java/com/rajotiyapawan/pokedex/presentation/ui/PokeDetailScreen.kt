@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 enum class PokemonDataTabs {
-    About, Stats, Moves, Other
+    About, //Stats, Moves, Other
 }
 
 @Composable
@@ -151,7 +151,7 @@ private fun DetailMainUI(modifier: Modifier = Modifier, viewModel: PokeViewModel
                             aboutTabUI(modifier = Modifier.fillMaxWidth(), viewModel, data, typeColors)
                         }
 
-                        PokemonDataTabs.Stats -> {
+                        /*PokemonDataTabs.Stats -> {
                             item { Text("Stats") }
                         }
 
@@ -161,7 +161,7 @@ private fun DetailMainUI(modifier: Modifier = Modifier, viewModel: PokeViewModel
 
                         PokemonDataTabs.Other -> {
                             item { Text("Other") }
-                        }
+                        }*/
                     }
                 }
                 Row(
@@ -213,18 +213,13 @@ private fun DetailTopSection(
         }
     }
     val scaleInX = remember { Animatable(1f) }
-    val scaleInY = remember { Animatable(1f) }
     val startWidth = with(LocalDensity.current) { (56.dp).toPx() }
 
     val targetSizePx = remember { mutableStateOf(IntSize.Zero) }
     LaunchedEffect(targetSizePx.value) {
         val scaleFactorX = targetSizePx.value.width / startWidth
-        val scaleFactorY = targetSizePx.value.height / startWidth
         launch {
             scaleInX.animateTo(scaleFactorX, tween(500))
-        }
-        launch {
-            scaleInY.animateTo(scaleFactorY, tween(500))
         }
     }
     Box(modifier) {
@@ -294,7 +289,7 @@ private fun DetailTopSection(
                 fontSize = 24.sp,
                 color = Color.White
             )
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(48.dp))
             Box(
                 Modifier
                     .fillMaxWidth()
