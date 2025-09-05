@@ -46,9 +46,7 @@ class PokedexMainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(scrim = Color.RED, darkScrim = "#b51f23".toColorInt()),
-        )
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
             ModuleActivityTheme {
