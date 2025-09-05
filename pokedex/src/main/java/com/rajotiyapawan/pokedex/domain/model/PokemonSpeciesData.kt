@@ -1,6 +1,4 @@
-package com.rajotiyapawan.pokedex.model
-
-import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
+package com.rajotiyapawan.pokedex.domain.model
 
 data class PokemonSpeciesData(
     val flavourText: String,
@@ -11,11 +9,17 @@ data class PokemonSpeciesData(
     val baseFriendship: Int,
     val hatchCounter: Int,
     val eggGroups: List<NameUrlItem>?,
-    val evolutionChain: NameUrlItem?
+    val evolutionChain: NameUrlItem?,
+    val varieties: List<Variety>
 ) {
+    data class Variety(
+        val is_default: Boolean,
+        val pokemon: NameUrlItem
+    )
+
     companion object {
         fun init(): PokemonSpeciesData {
-            return PokemonSpeciesData("", "", "", 0.0, 0.0, 0, 0, listOf(), NameUrlItem())
+            return PokemonSpeciesData("", "", "", 0.0, 0.0, 0, 0, listOf(), NameUrlItem(), listOf())
         }
     }
 }

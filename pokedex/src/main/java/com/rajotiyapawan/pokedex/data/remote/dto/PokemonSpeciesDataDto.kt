@@ -20,6 +20,7 @@ data class PokemonSpeciesDataDto(
     val habitat: NameUrlDto,
     val shape: NameUrlDto,
     val pokedex_numbers: List<PokemonNumber>,
+    val varieties: List<VarietyDto>
 ) {
     data class Genus(
         val genus: String,
@@ -29,6 +30,11 @@ data class PokemonSpeciesDataDto(
     data class PokemonNumber(
         val entry_number: Int,
         val pokedex: NameUrlDto,
+    )
+
+    data class VarietyDto(
+        val is_default: Boolean,
+        val pokemon: NameUrlDto
     )
 
 }

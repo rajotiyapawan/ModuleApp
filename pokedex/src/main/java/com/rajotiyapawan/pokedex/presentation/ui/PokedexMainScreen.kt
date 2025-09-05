@@ -78,7 +78,7 @@ fun PokedexMainScreen(modifier: Modifier = Modifier, viewModel: PokeViewModel) {
 
 @Composable
 private fun MainScreenUI(modifier: Modifier = Modifier, viewModel: PokeViewModel) {
-    LaunchedEffect(Unit) { viewModel.onQueryChanged("") }
+//    LaunchedEffect(Unit) { viewModel.onQueryChanged("") }
     val focusManager = LocalFocusManager.current
     Scaffold(modifier) { padding ->
         Column(

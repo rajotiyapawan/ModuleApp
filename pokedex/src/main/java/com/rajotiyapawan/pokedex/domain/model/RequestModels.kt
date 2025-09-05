@@ -4,5 +4,7 @@ data class RequestModel(
     val name: String? = null,
     val url: String? = null,
     val offset: Int? = 0,
-    val limit: Int? = 2000
+    val limit: Int? = 2000,
+    val varieties: List<String> = listOf<String>(),
+    val currentPokemon: String = ""
 )

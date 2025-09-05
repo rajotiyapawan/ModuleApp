@@ -8,24 +8,22 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rajotiyapawan.network.ApiResponse
-import com.rajotiyapawan.network.NetworkRepository
 import com.rajotiyapawan.pokedex.data.repository.PokemonRepositoryImpl
 import com.rajotiyapawan.pokedex.domain.model.AbilityDetails.AbilityEffect
+import com.rajotiyapawan.pokedex.domain.model.EvolutionChain
 import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
 import com.rajotiyapawan.pokedex.domain.model.PokemonBasicInfo
 import com.rajotiyapawan.pokedex.domain.model.PokemonData
+import com.rajotiyapawan.pokedex.domain.model.PokemonListData
+import com.rajotiyapawan.pokedex.domain.model.PokemonSpeciesData
 import com.rajotiyapawan.pokedex.domain.model.RequestModel
 import com.rajotiyapawan.pokedex.domain.usecase.GetAbilityDetailsUseCase
+import com.rajotiyapawan.pokedex.domain.usecase.GetEvolutionChainDetailsUseCase
 import com.rajotiyapawan.pokedex.domain.usecase.GetPokemonBasicInfoUseCase
 import com.rajotiyapawan.pokedex.domain.usecase.GetPokemonDetailsUseCase
 import com.rajotiyapawan.pokedex.domain.usecase.GetPokemonListUseCase
 import com.rajotiyapawan.pokedex.domain.usecase.GetPokemonSpeciesDataUseCase
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
-import com.rajotiyapawan.pokedex.model.PokemonEvolution
-import com.rajotiyapawan.pokedex.model.PokemonEvolutionDto
-import com.rajotiyapawan.pokedex.model.PokemonListData
-import com.rajotiyapawan.pokedex.model.PokemonSpeciesData
-import com.rajotiyapawan.pokedex.model.toChain
 import com.rajotiyapawan.pokedex.utility.UiState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -43,7 +41,8 @@ class PokeViewModel(
     private val getPokemonDetailsUseCase: GetPokemonDetailsUseCase,
     private val getPokemonSpeciesDataUseCase: GetPokemonSpeciesDataUseCase,
     private val getPokemonBasicInfoUseCase: GetPokemonBasicInfoUseCase,
-    private val getAbilityDetailsUseCase: GetAbilityDetailsUseCase
+    private val getAbilityDetailsUseCase: GetAbilityDetailsUseCase,
+    private val getEvolutionChainDetailsUseCase: GetEvolutionChainDetailsUseCase
 ) : ViewModel() {
 
     companion object {
@@ -55,11 +54,12 @@ class PokeViewModel(
                 val getPokemonSpeciesDataUseCase = GetPokemonSpeciesDataUseCase(pokeRepo)
                 val getPokemonBasicInfoUseCase = GetPokemonBasicInfoUseCase(pokeRepo)
                 val getAbilityDetailsUseCase = GetAbilityDetailsUseCase(pokeRepo)
+                val getEvolutionChainDetailsUseCase = GetEvolutionChainDetailsUseCase(pokeRepo)
                 return@initializer PokeViewModel(
                     getPokemonListUseCase,
                     getPokemonDetailsUseCase,
                     getPokemonSpeciesDataUseCase,
-                    getPokemonBasicInfoUseCase, getAbilityDetailsUseCase
+                    getPokemonBasicInfoUseCase, getAbilityDetailsUseCase, getEvolutionChainDetailsUseCase
                 )
             }
         }
@@ -233,19 +233,25 @@ class PokeViewModel(
         }
     }
 
-    private val _evolutionChain = MutableStateFlow(PokemonEvolution(null))
+    private val _evolutionChain = MutableStateFlow(EvolutionChain(null))
     val evolutionChain = _evolutionChain.asStateFlow()
 
-    fun getEvolutionChain(item: NameUrlItem?) {
+    fun getEvolutionChain(item: NameUrlItem?, varieties: List<String>, currentPokemon: String) {
         viewModelScope.launch {
-            val response = NetworkRepository.get<PokemonEvolutionDto>(item?.url ?: "")
-            if (response is ApiResponse.Success) {
-                val detail = response.data
-                _evolutionChain.value = PokemonEvolution(
-                    chain = detail.chain?.toChain()
+            getEvolutionChainDetailsUseCase.invoke(
+                RequestModel(
+                    name = item?.name,
+                    url = item?.url,
+                    varieties = varieties,
+                    currentPokemon = currentPokemon
                 )
-            } else if (response is ApiResponse.Error) {
-                Log.e("FetchError", "Failed for ${item?.name}: ${response.message}")
+            ).collectLatest {
+                when (it) {
+                    is ApiResponse.Error -> Log.e("FetchError", "Failed for ${item?.name}: ${it.message}")
+                    is ApiResponse.Success -> {
+                        _evolutionChain.value = it.data
+                    }
+                }
             }
         }
     }

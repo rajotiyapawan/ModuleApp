@@ -2,6 +2,7 @@ package com.rajotiyapawan.pokedex.data.mapper
 
 import com.rajotiyapawan.pokedex.data.remote.dto.AbilityDetailDto
 import com.rajotiyapawan.pokedex.data.remote.dto.AbilityDto
+import com.rajotiyapawan.pokedex.data.remote.dto.EvolutionChainDto
 import com.rajotiyapawan.pokedex.data.remote.dto.FlavourEntryDto
 import com.rajotiyapawan.pokedex.data.remote.dto.NameUrlDto
 import com.rajotiyapawan.pokedex.data.remote.dto.PokeTypesDto
@@ -11,14 +12,17 @@ import com.rajotiyapawan.pokedex.data.remote.dto.PokemonSpeciesDataDto
 import com.rajotiyapawan.pokedex.data.remote.dto.StatsDto
 import com.rajotiyapawan.pokedex.domain.model.Ability
 import com.rajotiyapawan.pokedex.domain.model.AbilityDetails
+import com.rajotiyapawan.pokedex.domain.model.Chain
+import com.rajotiyapawan.pokedex.domain.model.EvolutionChain
+import com.rajotiyapawan.pokedex.domain.model.EvolutionDetail
 import com.rajotiyapawan.pokedex.domain.model.FlavourEntry
 import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
 import com.rajotiyapawan.pokedex.domain.model.PokeType
 import com.rajotiyapawan.pokedex.domain.model.PokemonBasicInfo
 import com.rajotiyapawan.pokedex.domain.model.PokemonData
+import com.rajotiyapawan.pokedex.domain.model.PokemonListData
+import com.rajotiyapawan.pokedex.domain.model.PokemonSpeciesData
 import com.rajotiyapawan.pokedex.domain.model.Stats
-import com.rajotiyapawan.pokedex.model.PokemonListData
-import com.rajotiyapawan.pokedex.model.PokemonSpeciesData
 
 fun PokemonListDto.toDomain(): PokemonListData {
     return PokemonListData(
@@ -80,7 +84,14 @@ fun PokemonSpeciesDataDto.toDomain(): PokemonSpeciesData {
         baseFriendship = base_happiness,
         hatchCounter = hatch_counter,
         eggGroups = egg_groups?.map { it.toDomain() }?.toList(),
-        evolutionChain = evolution_chain?.toDomain()
+        evolutionChain = evolution_chain?.toDomain(),
+        varieties = varieties.map { it.toDomain() }.toList()
+    )
+}
+
+fun PokemonSpeciesDataDto.VarietyDto.toDomain(): PokemonSpeciesData.Variety {
+    return PokemonSpeciesData.Variety(
+        is_default, pokemon.toDomain()
     )
 }
 
@@ -108,4 +119,37 @@ fun AbilityDetailDto.AbilityEffectDto.toDomain(): AbilityDetails.AbilityEffect {
 
 fun FlavourEntryDto.toDomain(): FlavourEntry {
     return FlavourEntry(flavor_text, language.toDomain(), version?.toDomain(), version_group.toDomain())
+}
+
+fun EvolutionChainDto.toDomain(
+    speciesVarieties: Map<String, List<String>>,
+    suffix: String?
+): EvolutionChain {
+    return EvolutionChain(
+        chain = chain?.toDomain(speciesVarieties, suffix)
+    )
+}
+
+fun EvolutionChainDto.ChainDto.toDomain(
+    speciesVarieties: Map<String, List<String>>,
+    suffix: String?
+): Chain {
+    val baseName = species.name ?: ""
+    // try to pick baseName + suffix if suffix != null and that exact variant exists in that species' varieties
+    val mappedName = if (!suffix.isNullOrEmpty()) {
+        val candidate = baseName + suffix
+        val varieties = speciesVarieties[baseName] ?: emptyList()
+        if (varieties.contains(candidate)) candidate else baseName
+    } else baseName
+    return Chain(
+        evolvesTo = evolves_to?.map { it.toDomain(speciesVarieties, suffix) } ?: listOf(),
+        species = species.copy(name = mappedName),
+        evolutionDetails = evolution_details.map { it.toDomain() }.toList()
+    )
+}
+
+fun EvolutionChainDto.EvolutionDetailDto.toDomain(): EvolutionDetail {
+    return EvolutionDetail(
+        min_level, needs_overworld_rain, time_of_day, trigger.toDomain(), turn_upside_down
+    )
 }

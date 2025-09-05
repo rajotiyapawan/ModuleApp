@@ -29,9 +29,15 @@ import com.rajotiyapawan.pokedex.utility.getFontFamily
 import com.rajotiyapawan.pokedex.utility.noRippleClick
 
 @Composable
-fun AboutEvolution(modifier: Modifier = Modifier, color: Color, viewModel: PokeViewModel) {
+fun AboutEvolution(modifier: Modifier = Modifier, color: Color, currentPokemon: String, viewModel: PokeViewModel) {
     val aboutData by viewModel.aboutData.collectAsState()
-    LaunchedEffect(Unit) { viewModel.getEvolutionChain(aboutData.evolutionChain) }
+    LaunchedEffect(Unit) {
+        viewModel.getEvolutionChain(
+            aboutData.evolutionChain,
+            aboutData.varieties.map { it.pokemon.name ?: "" },
+            currentPokemon
+        )
+    }
     val evolutionChain by viewModel.evolutionChain.collectAsState()
     val firstPokemon = evolutionChain.chain?.species
 

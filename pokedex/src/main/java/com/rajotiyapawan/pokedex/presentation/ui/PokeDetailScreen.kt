@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -293,6 +294,7 @@ private fun DetailTopSection(
                 fontSize = 24.sp,
                 color = Color.White
             )
+            Spacer(Modifier.height(28.dp))
             Box(
                 Modifier
                     .fillMaxWidth()

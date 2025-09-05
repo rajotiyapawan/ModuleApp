@@ -1,6 +1,4 @@
-package com.rajotiyapawan.pokedex.model
-
-import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
+package com.rajotiyapawan.pokedex.domain.model
 
 data class PokemonListData(
     val count: Int,
@@ -8,4 +6,3 @@ data class PokemonListData(
     val previous: String?,
     val results: List<NameUrlItem>?
 )
-
