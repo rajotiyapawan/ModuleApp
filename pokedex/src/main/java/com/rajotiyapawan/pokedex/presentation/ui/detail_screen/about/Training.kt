@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.rajotiyapawan.pokedex.domain.model.PokemonData
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
-import com.rajotiyapawan.pokedex.utility.capitalize
+import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
 import com.rajotiyapawan.pokedex.utility.getFontFamily
 
 @Composable
@@ -34,9 +34,9 @@ fun AboutTraining(modifier: Modifier = Modifier, color: Color, data: PokemonData
             TrainingItem(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp), "GrowthRate", listOf(aboutData.growthRate.capitalize())
+                    .padding(vertical = 4.dp), "GrowthRate", listOf(aboutData.growthRate.capitalizeFirstChar())
             )
-            val evYieldList = data.stats?.filter { (it.effort ?: 0) > 0 }?.map { "${it.effort} ${it.stat?.name?.capitalize()}" } ?: listOf()
+            val evYieldList = data.stats?.filter { (it.effort ?: 0) > 0 }?.map { "${it.effort} ${it.stat?.name?.capitalizeFirstChar()}" } ?: listOf()
             TrainingItem(
                 modifier = Modifier
                     .fillMaxWidth()

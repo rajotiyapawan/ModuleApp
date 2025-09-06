@@ -41,7 +41,7 @@ fun getFontFamily(
     return FontFamily(Font(googleFont = font, fontProvider, weight = weight, style = fontStyle))
 }
 
-fun String.capitalize(): String {
+fun String.capitalizeFirstChar(): String {
     return this.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 }
 

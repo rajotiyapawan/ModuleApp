@@ -38,7 +38,7 @@ import com.rajotiyapawan.pokedex.domain.model.Ability
 import com.rajotiyapawan.pokedex.domain.model.AbilityDetails.AbilityEffect
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
-import com.rajotiyapawan.pokedex.utility.capitalize
+import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
 import com.rajotiyapawan.pokedex.utility.getFontFamily
 import com.rajotiyapawan.pokedex.utility.noRippleClick
 
@@ -72,7 +72,7 @@ fun AboutAbilities(
             Spacer(Modifier.height(18.dp))
             abilities.forEach { ability ->
                 val detail = viewModel.abilityDetails[ability.ability?.name ?: ""]
-                LaunchedEffect(Unit) {
+                LaunchedEffect(ability.ability?.name) {
                     if (detail == null) viewModel.getAbilityEffect(ability.ability)
                 }
                 AbilityItem(
@@ -81,7 +81,7 @@ fun AboutAbilities(
                         .background(color = color.copy(alpha = 0.2f), shape = RoundedCornerShape(4.dp))
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                     abilityName = ability.ability?.name ?: "",
-                    isHidden = ability.isHidden == true,
+                    isHidden = ability.isHidden,
                     description = detail?.flavor_text ?: "",
                     color = color,
                     onInfoClick = {
@@ -118,7 +118,7 @@ private fun AbilityItem(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                abilityName.capitalize(),
+                abilityName.capitalizeFirstChar(),
                 color = color,
                 fontFamily = getFontFamily(weight = FontWeight.SemiBold),
                 fontSize = 12.sp,
@@ -155,7 +155,7 @@ private fun AbilitiesDialogUI(modifier: Modifier = Modifier, title: String, deta
             fontSize = 10.sp,
             lineHeight = 11.sp
         )
-        Text(title.capitalize(), fontFamily = getFontFamily(weight = FontWeight.SemiBold))
+        Text(title.capitalizeFirstChar(), fontFamily = getFontFamily(weight = FontWeight.SemiBold))
         Box(
             modifier
                 .fillMaxWidth()

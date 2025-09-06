@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
-import com.rajotiyapawan.pokedex.utility.capitalize
+import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
 import com.rajotiyapawan.pokedex.utility.getFontFamily
 import com.rajotiyapawan.pokedex.utility.noRippleClick
 
@@ -65,7 +65,7 @@ fun AboutBreeding(modifier: Modifier = Modifier, color: Color, viewModel: PokeVi
                             .padding(horizontal = 5.dp, vertical = 3.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "${it.name?.capitalize()}",
+                            text = "${it.name?.capitalizeFirstChar()}",
                             fontWeight = FontWeight.Bold, textAlign = TextAlign.Start,
                             fontFamily = getFontFamily(),
                             fontSize = 12.sp,

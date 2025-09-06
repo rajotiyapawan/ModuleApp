@@ -24,7 +24,7 @@ import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
-import com.rajotiyapawan.pokedex.utility.capitalize
+import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
 import com.rajotiyapawan.pokedex.utility.getFontFamily
 import com.rajotiyapawan.pokedex.utility.noRippleClick
 
@@ -56,9 +56,9 @@ fun AboutEvolution(modifier: Modifier = Modifier, color: Color, currentPokemon: 
                         Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                             EvolvePokemon(modifier = Modifier, pokemon = secondPokemon, viewModel = viewModel)
                             Text(
-                                "Level ${
+                                "${
                                     evolutionChain.chain?.evolvesTo?.get(0)?.evolutionDetails?.takeIf { it.isNotEmpty() }
-                                        ?.get(0)?.min_level
+                                        ?.get(0)?.getRequirementText()
                                 }",
                                 fontSize = 12.sp,
                                 lineHeight = 13.sp,
@@ -70,9 +70,9 @@ fun AboutEvolution(modifier: Modifier = Modifier, color: Color, currentPokemon: 
                             Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                                 EvolvePokemon(modifier = Modifier, pokemon = thirdPokemon, viewModel = viewModel)
                                 Text(
-                                    "Level ${
+                                    "${
                                         evolutionChain.chain?.evolvesTo?.get(0)?.evolvesTo?.get(0)?.evolutionDetails?.takeIf { it.isNotEmpty() }
-                                            ?.get(0)?.min_level
+                                            ?.get(0)?.getRequirementText()
                                     }",
                                     fontSize = 12.sp,
                                     lineHeight = 13.sp,
@@ -107,7 +107,7 @@ private fun EvolvePokemon(modifier: Modifier = Modifier, pokemon: NameUrlItem?, 
                     }
             )
             Text(
-                (it.name ?: "").capitalize(),
+                (it.name ?: "").capitalizeFirstChar(),
                 fontSize = 12.sp,
                 lineHeight = 13.sp,
                 fontFamily = getFontFamily(weight = FontWeight.SemiBold)

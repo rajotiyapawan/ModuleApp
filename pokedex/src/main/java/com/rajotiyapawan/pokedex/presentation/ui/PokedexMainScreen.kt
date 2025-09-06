@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -54,7 +54,7 @@ import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.UiState
-import com.rajotiyapawan.pokedex.utility.capitalize
+import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
 import com.rajotiyapawan.pokedex.utility.getFontFamily
 import com.rajotiyapawan.pokedex.utility.getTypeColor
 import com.rajotiyapawan.pokedex.utility.noRippleClick
@@ -64,8 +64,6 @@ import java.util.Locale
 fun PokedexMainScreen(modifier: Modifier = Modifier, viewModel: PokeViewModel) {
     val pokeData = viewModel.pokemonList.collectAsState()
     when (val response = pokeData.value) {
-        is UiState.Error -> {}
-        UiState.Idle -> {}
         UiState.Loading -> {
             Box(modifier, contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(Modifier.size(56.dp))
@@ -75,12 +73,15 @@ fun PokedexMainScreen(modifier: Modifier = Modifier, viewModel: PokeViewModel) {
         is UiState.Success -> {
             response.data.results?.let { MainScreenUI(modifier, viewModel) }
         }
+
+        else -> {
+            Log.e("Fetch Error", "No data.")
+        }
     }
 }
 
 @Composable
 private fun MainScreenUI(modifier: Modifier = Modifier, viewModel: PokeViewModel) {
-//    LaunchedEffect(Unit) { viewModel.onQueryChanged("") }
     val focusManager = LocalFocusManager.current
     Scaffold(modifier) { padding ->
         Column(
@@ -172,7 +173,7 @@ private fun PokemonListUI(modifier: Modifier = Modifier, viewModel: PokeViewMode
         contentPadding = PaddingValues(bottom = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        itemsIndexed(list) { index, item ->
+        items(list) { item ->
             PokemonListItem(Modifier.fillMaxWidth(), item, viewModel, itemSelected = {
                 viewModel.sendUserEvent(PokedexUserEvent.OpenDetail(item))
             })
@@ -255,8 +256,8 @@ private fun PokemonListItem(
             }
         }
         Column(Modifier.padding(start = 8.dp)) {
-            Text((item.name ?: "").capitalize(), fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 18.sp)
-            Text(text = detail?.types?.joinToString(", ", transform = { it.name.lowercase().capitalize() }) ?: "")
+            Text((item.name ?: "").capitalizeFirstChar(), fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 18.sp)
+            Text(text = detail?.types?.joinToString(", ", transform = { it.name.lowercase().capitalizeFirstChar() }) ?: "")
         }
         val id = detail?.id ?: 0
         val formatted = if (id < 1000) {

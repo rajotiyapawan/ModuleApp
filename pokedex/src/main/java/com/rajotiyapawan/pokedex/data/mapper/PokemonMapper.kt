@@ -142,14 +142,19 @@ fun EvolutionChainDto.ChainDto.toDomain(
         if (varieties.contains(candidate)) candidate else baseName
     } else baseName
     return Chain(
-        evolvesTo = evolves_to?.map { it.toDomain(speciesVarieties, suffix) } ?: listOf(),
-        species = species.copy(name = mappedName),
-        evolutionDetails = evolution_details.map { it.toDomain() }.toList()
+        evolvesTo = evolvesTo?.map { it.toDomain(speciesVarieties, suffix) } ?: listOf(),
+        species = species.copy(name = mappedName).toDomain(),
+        evolutionDetails = evolutionDetails.map { it.toDomain() }.toList()
     )
 }
 
 fun EvolutionChainDto.EvolutionDetailDto.toDomain(): EvolutionDetail {
     return EvolutionDetail(
-        min_level, needs_overworld_rain, time_of_day, trigger.toDomain(), turn_upside_down
+        minLevel = minLevel ?: 0,
+        needsOverworldRain = needsOverworldRain ?: false,
+        timeOfDay = timeOfDay ?: "",
+        trigger = trigger.toDomain(),
+        turnUpsideDown = turnUpsideDown ?: false,
+        item = item?.toDomain()
     )
 }

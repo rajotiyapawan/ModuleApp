@@ -121,7 +121,7 @@ class PokemonRepositoryImpl : PokemonRepository {
         chain.species.url?.let { url ->
             speciesPairs.add(chain.species.name!! to url)
         }
-        chain.evolves_to?.forEach {
+        chain.evolvesTo?.forEach {
             speciesPairs.addAll(collect(it))
         }
         return speciesPairs

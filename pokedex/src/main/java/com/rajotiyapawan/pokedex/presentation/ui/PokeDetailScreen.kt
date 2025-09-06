@@ -1,5 +1,6 @@
 package com.rajotiyapawan.pokedex.presentation.ui
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -64,7 +65,7 @@ import com.rajotiyapawan.pokedex.model.PokedexUserEvent
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.about.aboutTabUI
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.UiState
-import com.rajotiyapawan.pokedex.utility.capitalize
+import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
 import com.rajotiyapawan.pokedex.utility.getFontFamily
 import com.rajotiyapawan.pokedex.utility.getTypeColor
 import com.rajotiyapawan.pokedex.utility.noRippleClick
@@ -72,7 +73,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 enum class PokemonDataTabs {
-    About, //Stats, Moves, Other
+    About, Stats, Moves, Other
 }
 
 @Composable
@@ -83,8 +84,6 @@ fun PokemonDetailScreen(modifier: Modifier = Modifier, nameItem: NameUrlItem, vi
     }
     val pokeData = viewModel.pokemonData.collectAsState()
     when (val response = pokeData.value) {
-        is UiState.Error -> {}
-        UiState.Idle -> {}
         UiState.Loading -> {
             CircularProgressIndicator(modifier)
         }
@@ -92,8 +91,17 @@ fun PokemonDetailScreen(modifier: Modifier = Modifier, nameItem: NameUrlItem, vi
         is UiState.Success -> {
             DetailMainUI(modifier, viewModel, response.data)
         }
+
+        else -> {
+            Log.e("Fetch Error", "No data.")
+        }
     }
 }
+
+private fun getStatusBarColor(index: Int): Color =
+    if (index == 0) Color.Transparent else Color(0xfff5f5f5)
+
+private fun getTintColorBasedOnStatusBarColor(statusBarColor: Color): Color = if (statusBarColor == Color.Transparent) Color.White else Color.Black
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -103,11 +111,7 @@ private fun DetailMainUI(modifier: Modifier = Modifier, viewModel: PokeViewModel
     LaunchedEffect(Unit) {
         snapshotFlow { listState.firstVisibleItemIndex }
             .collect { index ->
-                statusBarColor.value = if (index == 0) {
-                    Color.Transparent
-                } else {
-                    Color(0xfff5f5f5)
-                }
+                statusBarColor.value = getStatusBarColor(index)
             }
     }
     val width = remember { mutableStateOf(0) }
@@ -151,7 +155,7 @@ private fun DetailMainUI(modifier: Modifier = Modifier, viewModel: PokeViewModel
                             aboutTabUI(modifier = Modifier.fillMaxWidth(), viewModel, data, typeColors)
                         }
 
-                        /*PokemonDataTabs.Stats -> {
+                        PokemonDataTabs.Stats -> {
                             item { Text("Stats") }
                         }
 
@@ -161,7 +165,7 @@ private fun DetailMainUI(modifier: Modifier = Modifier, viewModel: PokeViewModel
 
                         PokemonDataTabs.Other -> {
                             item { Text("Other") }
-                        }*/
+                        }
                     }
                 }
                 Row(
@@ -179,7 +183,7 @@ private fun DetailMainUI(modifier: Modifier = Modifier, viewModel: PokeViewModel
                         modifier = Modifier
                             .padding(8.dp)
                             .noRippleClick { viewModel.sendUserEvent(PokedexUserEvent.BackBtnClicked) },
-                        tint = if (statusBarColor.value == Color.Transparent) Color.White else Color.Black
+                        tint = getTintColorBasedOnStatusBarColor(statusBarColor.value)
                     )
                     Icon(
                         Icons.Default.FavoriteBorder, contentDescription = null, modifier = Modifier
@@ -187,7 +191,7 @@ private fun DetailMainUI(modifier: Modifier = Modifier, viewModel: PokeViewModel
                             .noRippleClick {
                                 viewModel.toggleFavourites(NameUrlItem(data.name, ""))
                             },
-                        tint = if (statusBarColor.value == Color.Transparent) Color.White else Color.Black
+                        tint = getTintColorBasedOnStatusBarColor(statusBarColor.value)
                     )
                 }
             }
@@ -229,9 +233,10 @@ private fun DetailTopSection(
                 .fillMaxHeight()
                 .drawBehind {
                     val canvasWidth = size.width
-                    val arcHeight = 450f // height of the curved area
+                    val arcHeight = 510f // height of the curved area
                     val path = Path().apply {
-                        moveTo(0f, 0f)
+                        // Start at top-left corner
+                        moveTo(-2f, -40f)
                         arcTo(
                             rect = Rect(
                                 left = -canvasWidth / 2f,
@@ -243,7 +248,7 @@ private fun DetailTopSection(
                             sweepAngleDegrees = -180f,
                             forceMoveTo = false
                         )
-                        lineTo(canvasWidth, 0f)
+                        lineTo(canvasWidth, -40f)
                         close()
                     }
 
@@ -284,12 +289,12 @@ private fun DetailTopSection(
         ) {
             Text("#$id", fontFamily = getFontFamily(weight = FontWeight.SemiBold), color = Color.White)
             Text(
-                (data.name ?: "").capitalize(),
+                (data.name ?: "").capitalizeFirstChar(),
                 fontFamily = getFontFamily(weight = FontWeight.SemiBold),
                 fontSize = 24.sp,
                 color = Color.White
             )
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(50.dp))
             Box(
                 Modifier
                     .fillMaxWidth()
