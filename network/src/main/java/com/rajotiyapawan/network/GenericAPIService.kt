@@ -9,8 +9,8 @@ import retrofit2.http.Url
 
 interface GenericAPIService {
     @GET
-    suspend fun get(@Url url: String): Response<ResponseBody>
+    suspend fun getCall(@Url url: String): Response<ResponseBody>
 
     @POST
-    suspend fun post(@Url url: String, @Body body: Any): Response<ResponseBody>
+    suspend fun postCall(@Url url: String, @Body body: Any): Response<ResponseBody>
 }

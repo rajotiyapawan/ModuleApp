@@ -30,6 +30,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -66,7 +67,7 @@ class PokeViewModel(
     }
 
     private var _userEvent = MutableSharedFlow<PokedexUserEvent>()
-    val userEvent = _userEvent
+    val userEvent = _userEvent.asSharedFlow()
 
     private var _pokemonList: MutableStateFlow<UiState<PokemonListData>> = MutableStateFlow(UiState.Idle)
     val pokemonList = _pokemonList.asStateFlow()
@@ -75,7 +76,6 @@ class PokeViewModel(
     private val _pokemonDetails = mutableStateMapOf<String, PokemonBasicInfo>()
     val pokemonDetails = _pokemonDetails
     private val _pokemonCache = mutableMapOf<String, PokemonData>()
-    val pokemonCache = _pokemonCache
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
@@ -112,7 +112,9 @@ class PokeViewModel(
                             }
                         }
 
-                        else -> {}
+                        else -> {
+                            Log.e("FetchError", "Pokemon list not available")
+                        }
                     }
                 }
         }
@@ -129,7 +131,9 @@ class PokeViewModel(
                         _searchResults.value = it.data.results ?: emptyList()
                     }
 
-                    is ApiResponse.Error -> {}
+                    is ApiResponse.Error -> {
+                        Log.e("FetchError", "Failed in getting the Pokemon list")
+                    }
                 }
             }
         }
@@ -153,7 +157,10 @@ class PokeViewModel(
         viewModelScope.launch {
             getPokemonDetailsUseCase.invoke(params = RequestModel(name = item.name, url = item.url)).collectLatest {
                 when (it) {
-                    is ApiResponse.Error -> {}
+                    is ApiResponse.Error -> {
+                        Log.e("FetchError", "Failed for ${item.name}: ${it.message}")
+                    }
+
                     is ApiResponse.Success<PokemonData> -> {
                         _pokemonData.value = UiState.Success(it.data)
                         _pokemonCache[name ?: ""] = it.data
@@ -210,11 +217,11 @@ class PokeViewModel(
 
         viewModelScope.launch {
             delay(100L) // Give some time between requests
-            getAbilityDetailsUseCase.invoke(RequestModel(name = item?.name, url = item?.url)).collectLatest {
-                when (it) {
-                    is ApiResponse.Error -> Log.e("FetchError", "Failed for ${item?.name}: ${it.message}")
+            getAbilityDetailsUseCase.invoke(RequestModel(name = item?.name, url = item?.url)).collectLatest { response ->
+                when (response) {
+                    is ApiResponse.Error -> Log.e("FetchError", "Failed for ${item?.name}: ${response.message}")
                     is ApiResponse.Success -> {
-                        val detail = it.data
+                        val detail = response.data
                         item?.name?.let { name ->
                             _abilityDetails[name] = AbilityEffect(
                                 effect = detail.effect_entries
@@ -261,6 +268,6 @@ class PokeViewModel(
 
 
     fun toggleFavourites(item: NameUrlItem) {
-
+        Log.e("Favourites", "Favourite icon clicked - ${item.name}")
     }
 }

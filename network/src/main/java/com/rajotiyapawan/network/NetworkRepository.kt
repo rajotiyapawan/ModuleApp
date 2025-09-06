@@ -8,11 +8,11 @@ object NetworkRepository {
     val gson = Gson()
     val service: GenericAPIService = NetworkModule.createService(GenericAPIService::class.java)
 
-    suspend inline fun <reified T : Any> get(
+    suspend inline fun <reified T : Any> getCall(
         url: String
     ): ApiResponse<T> {
         return try {
-            val response = service.get(url)
+            val response = service.getCall(url)
             if (response.isSuccessful) {
                 val body = response.body()?.string()
                 val parsed = gson.fromJson(body, T::class.java)
@@ -25,9 +25,9 @@ object NetworkRepository {
         }
     }
 
-    suspend inline fun <reified T> post(url: String, body: Any): ApiResponse<T> {
+    suspend inline fun <reified T> postCall(url: String, body: Any): ApiResponse<T> {
         return try {
-            val response = service.post(url, body)
+            val response = service.postCall(url, body)
             if (response.isSuccessful) {
                 val responseBody = response.body()?.string()
                 val parsed = gson.fromJson(responseBody, T::class.java)

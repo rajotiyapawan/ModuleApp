@@ -18,7 +18,6 @@ import com.rajotiyapawan.pokedex.domain.model.PokemonListData
 import com.rajotiyapawan.pokedex.domain.model.PokemonSpeciesData
 import com.rajotiyapawan.pokedex.domain.model.RequestModel
 import com.rajotiyapawan.pokedex.domain.repository.PokemonRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -28,7 +27,7 @@ import kotlinx.coroutines.flow.flow
 class PokemonRepositoryImpl : PokemonRepository {
     override fun getPokemonList(params: RequestModel): Flow<ApiResponse<PokemonListData>> = flow {
         val response =
-            NetworkRepository.get<PokemonListDto>("${POKE_BaseUrl}pokemon?offset=${params.offset}&limit=${params.limit}")
+            NetworkRepository.getCall<PokemonListDto>("${POKE_BaseUrl}pokemon?offset=${params.offset}&limit=${params.limit}")
         when (response) {
             is ApiResponse.Error -> emit(response)
             is ApiResponse.Success -> emit(ApiResponse.Success(response.data.toDomain()))
@@ -41,7 +40,7 @@ class PokemonRepositoryImpl : PokemonRepository {
         } else {
             "${POKE_BaseUrl}pokemon/${params.name}"
         }
-        val response = NetworkRepository.get<PokemonDataDto>(url)
+        val response = NetworkRepository.getCall<PokemonDataDto>(url)
         when (response) {
             is ApiResponse.Error -> emit(response)
             is ApiResponse.Success -> emit(ApiResponse.Success(response.data.toDomain()))
@@ -49,7 +48,7 @@ class PokemonRepositoryImpl : PokemonRepository {
     }
 
     override fun getPokemonSpeciesData(params: RequestModel): Flow<ApiResponse<PokemonSpeciesData>> = flow {
-        val response = NetworkRepository.get<PokemonSpeciesDataDto>(params.url ?: "")
+        val response = NetworkRepository.getCall<PokemonSpeciesDataDto>(params.url ?: "")
         when (response) {
             is ApiResponse.Error -> emit(response)
             is ApiResponse.Success -> emit(ApiResponse.Success(response.data.toDomain()))
@@ -62,7 +61,7 @@ class PokemonRepositoryImpl : PokemonRepository {
         } else {
             "${POKE_BaseUrl}pokemon/${params.name}"
         }
-        val response = NetworkRepository.get<PokemonDataDto>(url)
+        val response = NetworkRepository.getCall<PokemonDataDto>(url)
         when (response) {
             is ApiResponse.Error -> emit(response)
             is ApiResponse.Success -> emit(ApiResponse.Success(response.data.toBasicInfo()))
@@ -70,7 +69,7 @@ class PokemonRepositoryImpl : PokemonRepository {
     }
 
     override fun getAbilityDetails(params: RequestModel): Flow<ApiResponse<AbilityDetails>> = flow {
-        val response = NetworkRepository.get<AbilityDetailDto>(params.url ?: "")
+        val response = NetworkRepository.getCall<AbilityDetailDto>(params.url ?: "")
         when (response) {
             is ApiResponse.Error -> emit(response)
             is ApiResponse.Success -> emit(ApiResponse.Success(response.data.toDomain()))
@@ -78,7 +77,7 @@ class PokemonRepositoryImpl : PokemonRepository {
     }
 
     override fun getEvolutionDetails(params: RequestModel): Flow<ApiResponse<EvolutionChain>> = flow {
-        val response = NetworkRepository.get<EvolutionChainDto>(params.url ?: "")
+        val response = NetworkRepository.getCall<EvolutionChainDto>(params.url ?: "")
         when (response) {
             is ApiResponse.Error -> emit(response)
             is ApiResponse.Success -> {
@@ -89,8 +88,8 @@ class PokemonRepositoryImpl : PokemonRepository {
                 val speciesVarietiesMap = mutableMapOf<String, List<String>>() // baseName -> varieties
                 coroutineScope {
                     val deferred = unique.map { (baseName, url) ->
-                        async(Dispatchers.IO) {
-                            val spResp = NetworkRepository.get<PokemonSpeciesDataDto>(url)
+                        async {
+                            val spResp = NetworkRepository.getCall<PokemonSpeciesDataDto>(url)
                             val varieties = if (spResp is ApiResponse.Success) {
                                 spResp.data.varieties.mapNotNull { it.pokemon.name }
                             } else emptyList()
