@@ -26,31 +26,31 @@ data class EvolutionChainDto(
 
     data class EvolutionDetailDto(
         @SerializedName("gender")
-        val gender: Any?,
+        val gender: String?,
 
         @SerializedName("held_item")
-        val heldItem: Any?,
+        val heldItem: NameUrlDto?,
 
         @SerializedName("item")
         val item: NameUrlDto?,
 
         @SerializedName("known_move")
-        val knownMove: Any?,
+        val knownMove: NameUrlDto?,
 
         @SerializedName("known_move_type")
-        val knownMoveType: Any?,
+        val knownMoveType: NameUrlDto?,
 
         @SerializedName("location")
-        val location: Any?,
+        val location: NameUrlDto?,
 
         @SerializedName("min_affection")
-        val minAffection: Any?,
+        val minAffection: Int?,
 
         @SerializedName("min_beauty")
-        val minBeauty: Any?,
+        val minBeauty: Int?,
 
         @SerializedName("min_happiness")
-        val minHappiness: Any?,
+        val minHappiness: Int?,
 
         @SerializedName("min_level")
         val minLevel: Int?,
@@ -59,19 +59,19 @@ data class EvolutionChainDto(
         val needsOverworldRain: Boolean?,
 
         @SerializedName("party_species")
-        val partySpecies: Any?,
+        val partySpecies: NameUrlDto?,
 
         @SerializedName("party_type")
-        val partyType: Any?,
+        val partyType: NameUrlDto?,
 
         @SerializedName("relative_physical_stats")
-        val relativePhysicalStats: Any?,
+        val relativePhysicalStats: Int?,
 
         @SerializedName("time_of_day")
         val timeOfDay: String?,
 
         @SerializedName("trade_species")
-        val tradeSpecies: Any?,
+        val tradeSpecies: NameUrlDto?,
 
         @SerializedName("trigger")
         val trigger: NameUrlDto,

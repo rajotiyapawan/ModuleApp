@@ -151,10 +151,22 @@ fun EvolutionChainDto.ChainDto.toDomain(
 fun EvolutionChainDto.EvolutionDetailDto.toDomain(): EvolutionDetail {
     return EvolutionDetail(
         minLevel = minLevel ?: 0,
+        minHappiness = minHappiness ?: 0,
+        minAffection = minHappiness ?: 0,
+        minBeauty = minBeauty ?: 0,
         needsOverworldRain = needsOverworldRain ?: false,
         timeOfDay = timeOfDay ?: "",
         trigger = trigger.toDomain(),
         turnUpsideDown = turnUpsideDown ?: false,
-        item = item?.toDomain()
+        item = item?.toDomain(),
+        location = location?.toDomain(),
+        knownMoveType = knownMoveType?.toDomain(),
+        knownMove = knownMove?.toDomain(),
+        tradeSpecies = tradeSpecies?.toDomain(),
+        gender = gender ?: "",
+        heldItem = heldItem?.toDomain(),
+        partySpecies = partySpecies?.toDomain(),
+        partyType = partyType?.toDomain(),
+        relativePhysicalStats = relativePhysicalStats
     )
 }

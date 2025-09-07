@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,16 +20,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.rajotiyapawan.pokedex.domain.model.Chain
 import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
+import com.rajotiyapawan.pokedex.utility.TypeIcon
 import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
 import com.rajotiyapawan.pokedex.utility.getFontFamily
 import com.rajotiyapawan.pokedex.utility.noRippleClick
+import com.rajotiyapawan.pokedex.utility.toRequirementText
 
 @Composable
 fun AboutEvolution(modifier: Modifier = Modifier, color: Color, currentPokemon: String, viewModel: PokeViewModel) {
@@ -39,9 +46,8 @@ fun AboutEvolution(modifier: Modifier = Modifier, color: Color, currentPokemon: 
         )
     }
     val evolutionChain by viewModel.evolutionChain.collectAsState()
-    val firstPokemon = evolutionChain.chain?.species
 
-    if (evolutionChain.chain != null) {
+    evolutionChain.chain?.let { root ->
         DetailCardWithTitle(modifier, "Evolution chain", color) {
             Column(
                 Modifier
@@ -49,38 +55,29 @@ fun AboutEvolution(modifier: Modifier = Modifier, color: Color, currentPokemon: 
                     .padding(top = 4.dp)
                     .padding(12.dp)
             ) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    EvolvePokemon(modifier = Modifier.weight(1f), pokemon = firstPokemon, viewModel = viewModel)
-                    if (evolutionChain.chain?.evolvesTo?.isNotEmpty() == true) {
-                        val secondPokemon = evolutionChain.chain?.evolvesTo?.get(0)?.species
-                        Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                            EvolvePokemon(modifier = Modifier, pokemon = secondPokemon, viewModel = viewModel)
-                            Text(
-                                "${
-                                    evolutionChain.chain?.evolvesTo?.get(0)?.evolutionDetails?.takeIf { it.isNotEmpty() }
-                                        ?.get(0)?.getRequirementText()
-                                }",
-                                fontSize = 12.sp,
-                                lineHeight = 13.sp,
-                                fontFamily = getFontFamily()
-                            )
-                        }
-                        if (evolutionChain.chain?.evolvesTo?.get(0)?.evolvesTo?.isNotEmpty() == true) {
-                            val thirdPokemon = evolutionChain.chain?.evolvesTo?.get(0)?.evolvesTo?.get(0)?.species
-                            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                                EvolvePokemon(modifier = Modifier, pokemon = thirdPokemon, viewModel = viewModel)
-                                Text(
-                                    "${
-                                        evolutionChain.chain?.evolvesTo?.get(0)?.evolvesTo?.get(0)?.evolutionDetails?.takeIf { it.isNotEmpty() }
-                                            ?.get(0)?.getRequirementText()
-                                    }",
-                                    fontSize = 12.sp,
-                                    lineHeight = 13.sp,
-                                    fontFamily = getFontFamily()
-                                )
-                            }
-                        }
-                    }
+                EvolutionNode(Modifier.fillMaxWidth(), root, "", viewModel)
+            }
+        }
+    }
+}
+
+@Composable
+private fun EvolutionNode(modifier: Modifier = Modifier, chain: Chain, requirementText: String, viewModel: PokeViewModel) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        EvolvePokemon(Modifier, chain.species, requirementText, viewModel)
+        if (chain.evolvesTo.isNotEmpty()) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, Modifier
+                    .padding(horizontal = 8.dp)
+                    .size(20.dp)
+            )
+            Column(
+                Modifier,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                chain.evolvesTo.forEach { evo ->
+                    EvolutionNode(Modifier, chain = evo, evo.evolutionDetails.toRequirementText(), viewModel = viewModel)
                 }
             }
         }
@@ -88,7 +85,7 @@ fun AboutEvolution(modifier: Modifier = Modifier, color: Color, currentPokemon: 
 }
 
 @Composable
-private fun EvolvePokemon(modifier: Modifier = Modifier, pokemon: NameUrlItem?, viewModel: PokeViewModel) {
+private fun EvolvePokemon(modifier: Modifier = Modifier, pokemon: NameUrlItem?, requirementText: String, viewModel: PokeViewModel) {
     pokemon?.let {
         val detail = viewModel.pokemonDetails[it.name]
         Log.d("Evolution", "Pokemon name = ${it.name} and url = ${it.url}")
@@ -106,12 +103,25 @@ private fun EvolvePokemon(modifier: Modifier = Modifier, pokemon: NameUrlItem?, 
                         viewModel.sendUserEvent(PokedexUserEvent.OpenDetail(pokemon))
                     }
             )
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                detail?.types?.forEach {
+                    TypeIcon(type = it, withText = false)
+                }
+            }
             Text(
                 (it.name ?: "").capitalizeFirstChar(),
                 fontSize = 12.sp,
                 lineHeight = 13.sp,
                 fontFamily = getFontFamily(weight = FontWeight.SemiBold)
             )
+            if (requirementText.isNotEmpty()) {
+                Text(
+                    requirementText,
+                    fontSize = 12.sp,
+                    lineHeight = 13.sp,
+                    fontFamily = getFontFamily(), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(0.5f)
+                )
+            }
         }
     }
 }
