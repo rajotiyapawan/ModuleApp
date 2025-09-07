@@ -64,7 +64,8 @@ fun AboutEvolution(modifier: Modifier = Modifier, color: Color, currentPokemon: 
 @Composable
 private fun EvolutionNode(modifier: Modifier = Modifier, chain: Chain, requirementText: String, viewModel: PokeViewModel) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-        EvolvePokemon(Modifier, chain.species, requirementText, viewModel)
+        EvolvePokemon(Modifier.weight(1f), chain.species, requirementText, viewModel)
+        val innerWeight = if (chain.evolvesTo.any { it.evolvesTo.isNotEmpty() }) 2f else 1f
         if (chain.evolvesTo.isNotEmpty()) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, Modifier
@@ -72,7 +73,7 @@ private fun EvolutionNode(modifier: Modifier = Modifier, chain: Chain, requireme
                     .size(20.dp)
             )
             Column(
-                Modifier,
+                Modifier.weight(innerWeight),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -104,8 +105,8 @@ private fun EvolvePokemon(modifier: Modifier = Modifier, pokemon: NameUrlItem?, 
                     }
             )
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                detail?.types?.forEach {
-                    TypeIcon(type = it, withText = false)
+                detail?.types?.forEach { type ->
+                    TypeIcon(type = type, withText = false)
                 }
             }
             Text(
