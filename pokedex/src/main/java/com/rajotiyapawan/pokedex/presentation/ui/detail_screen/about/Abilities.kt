@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
@@ -27,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,7 +37,9 @@ import androidx.compose.ui.unit.sp
 import com.rajotiyapawan.pokedex.R
 import com.rajotiyapawan.pokedex.domain.model.Ability
 import com.rajotiyapawan.pokedex.domain.model.AbilityDetails.AbilityEffect
+import com.rajotiyapawan.pokedex.model.PokedexUserEvent
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
+import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.ShowListButton
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
 import com.rajotiyapawan.pokedex.utility.getFontFamily
@@ -50,6 +55,8 @@ fun AboutAbilities(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showAbilityDescription by remember { mutableStateOf("") }
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
 
     DetailCardWithTitle(
         modifier = modifier, title = "Abilities", color
@@ -80,7 +87,7 @@ fun AboutAbilities(
                         .padding(horizontal = 8.dp, vertical = 8.dp),
                     abilityName = ability.ability?.name ?: "",
                     isHidden = ability.isHidden,
-                    description = detail?.flavor_text ?: "",
+                    description = detail?.flavorText ?: "",
                     color = color,
                     onInfoClick = {
                         showAbilityDescription = ability.ability?.name ?: ""
@@ -96,7 +103,11 @@ fun AboutAbilities(
             containerColor = Color(0xfff5f5f5)
         ) {
             val detail = viewModel.abilityDetails[showAbilityDescription]
-            AbilitiesDialogUI(modifier = Modifier, title = showAbilityDescription, detail = detail, color = color)
+            Box(
+                modifier = Modifier.heightIn(max = screenHeight * 0.7f)
+            ) {
+                AbilitiesDialogUI(modifier = Modifier, title = showAbilityDescription, detail = detail, color = color, viewModel)
+            }
         }
     }
 }
@@ -144,43 +155,57 @@ private fun AbilityItem(
 }
 
 @Composable
-private fun AbilitiesDialogUI(modifier: Modifier = Modifier, title: String, detail: AbilityEffect?, color: Color) {
+private fun AbilitiesDialogUI(modifier: Modifier = Modifier, title: String, detail: AbilityEffect?, color: Color, viewModel: PokeViewModel) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            "ABILITY",
-            color = Color(0xff909090),
-            fontFamily = getFontFamily(weight = FontWeight.SemiBold),
-            fontSize = 10.sp,
-            lineHeight = 11.sp
-        )
-        Text(
-            title.capitalizeFirstChar(), fontFamily = getFontFamily(weight = FontWeight.Bold),
-            fontSize = 24.sp
-        )
-        Box(
-            modifier
-                .fillMaxWidth()
-                .padding(16.dp), contentAlignment = Alignment.TopCenter
-        ) {
-            DetailCardWithTitle(title = "Details", color = color) {
-                Column(
-                    Modifier
+        LazyColumn(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+            item {
+                Text(
+                    "ABILITY",
+                    color = Color(0xff909090),
+                    fontFamily = getFontFamily(weight = FontWeight.SemiBold),
+                    fontSize = 10.sp,
+                    lineHeight = 11.sp
+                )
+            }
+            item {
+                Text(
+                    title.capitalizeFirstChar(), fontFamily = getFontFamily(weight = FontWeight.Bold),
+                    fontSize = 24.sp
+                )
+            }
+            item {
+                DetailCardWithTitle(
+                    modifier = modifier
                         .fillMaxWidth()
-                        .padding(top = 20.dp, start = 16.dp, end = 16.dp, bottom = 20.dp)
+                        .padding(16.dp), title = "Details", color = color
                 ) {
-                    Text("Description", fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 20.sp, lineHeight = 24.sp)
-                    Spacer(Modifier.height(8.dp))
-                    Text(detail?.flavor_text ?: "", fontSize = 14.sp, lineHeight = 16.sp)
-                    Spacer(Modifier.height(16.dp))
-                    Text("Effect", fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 20.sp, lineHeight = 24.sp)
-                    Spacer(Modifier.height(8.dp))
-                    Text(detail?.short_effect ?: "", fontSize = 14.sp, lineHeight = 16.sp)
-                    Spacer(Modifier.height(16.dp))
-                    Text("Details", fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 20.sp, lineHeight = 24.sp)
-                    Spacer(Modifier.height(8.dp))
-                    Text(detail?.effect ?: "", fontSize = 14.sp, lineHeight = 16.sp)
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 20.dp, start = 16.dp, end = 16.dp, bottom = 20.dp)
+                    ) {
+                        Text("Description", fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 20.sp, lineHeight = 24.sp)
+                        Spacer(Modifier.height(8.dp))
+                        Text(detail?.flavorText ?: "", fontSize = 14.sp, lineHeight = 16.sp)
+                        Spacer(Modifier.height(16.dp))
+                        Text("Effect", fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 20.sp, lineHeight = 24.sp)
+                        Spacer(Modifier.height(8.dp))
+                        Text(detail?.shortEffect ?: "", fontSize = 14.sp, lineHeight = 16.sp)
+                        Spacer(Modifier.height(16.dp))
+                        Text("Details", fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 20.sp, lineHeight = 24.sp)
+                        Spacer(Modifier.height(8.dp))
+                        Text(detail?.effect ?: "", fontSize = 14.sp, lineHeight = 16.sp)
+                    }
                 }
             }
+        }
+        ShowListButton(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 20.dp)
+        ) {
+            viewModel.sendUserEvent(PokedexUserEvent.OpenAbilityList(abilityName = title))
         }
     }
 }

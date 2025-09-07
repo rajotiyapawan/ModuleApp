@@ -2,6 +2,7 @@ package com.rajotiyapawan.pokedex.domain.repository
 
 import com.rajotiyapawan.network.ApiResponse
 import com.rajotiyapawan.pokedex.domain.model.AbilityDetails
+import com.rajotiyapawan.pokedex.domain.model.EggGroupDetail
 import com.rajotiyapawan.pokedex.domain.model.EvolutionChain
 import com.rajotiyapawan.pokedex.domain.model.PokemonBasicInfo
 import com.rajotiyapawan.pokedex.domain.model.PokemonData
@@ -17,4 +18,5 @@ interface PokemonRepository {
     fun getPokemonSpeciesData(params: RequestModel): Flow<ApiResponse<PokemonSpeciesData>>
     fun getAbilityDetails(params: RequestModel): Flow<ApiResponse<AbilityDetails>>
     fun getEvolutionDetails(params: RequestModel): Flow<ApiResponse<EvolutionChain>>
+    fun getEggGroupPokemonList(params: RequestModel): Flow<ApiResponse<EggGroupDetail>>
 }

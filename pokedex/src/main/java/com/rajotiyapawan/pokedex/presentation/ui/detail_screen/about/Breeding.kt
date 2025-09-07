@@ -14,16 +14,11 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +30,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
+import com.rajotiyapawan.pokedex.model.PokedexUserEvent
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
@@ -45,8 +41,6 @@ import com.rajotiyapawan.pokedex.utility.getFontFamily
 @Composable
 fun AboutBreeding(modifier: Modifier = Modifier, color: Color, viewModel: PokeViewModel) {
     val aboutData by viewModel.aboutData.collectAsState()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showAbilityDescription by remember { mutableStateOf("") }
     DetailCardWithTitle(modifier, "Breeding", color) {
         Column(
             Modifier
@@ -67,7 +61,9 @@ fun AboutBreeding(modifier: Modifier = Modifier, color: Color, viewModel: PokeVi
                     .padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 aboutData.eggGroups?.forEach {
-                    EggGroupItem(Modifier.weight(1f), it) { showAbilityDescription = it.name ?: "" }
+                    EggGroupItem(Modifier.weight(1f), it) {
+                        viewModel.sendUserEvent(PokedexUserEvent.OpenEggGroupList(eggGroup = it.name ?: ""))
+                    }
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -92,15 +88,6 @@ fun AboutBreeding(modifier: Modifier = Modifier, color: Color, viewModel: PokeVi
                 lineHeight = 16.sp
             )
 
-        }
-    }
-    if (showAbilityDescription.isNotEmpty()) {
-        ModalBottomSheet(
-            onDismissRequest = { showAbilityDescription = "" },
-            sheetState = sheetState,
-            containerColor = Color(0xfff5f5f5)
-        ) {
-            Text("Show pokemon list for this egg group")
         }
     }
 }

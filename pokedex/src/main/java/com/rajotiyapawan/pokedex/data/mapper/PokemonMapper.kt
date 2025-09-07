@@ -2,6 +2,7 @@ package com.rajotiyapawan.pokedex.data.mapper
 
 import com.rajotiyapawan.pokedex.data.remote.dto.AbilityDetailDto
 import com.rajotiyapawan.pokedex.data.remote.dto.AbilityDto
+import com.rajotiyapawan.pokedex.data.remote.dto.EggGroupDetailDto
 import com.rajotiyapawan.pokedex.data.remote.dto.EvolutionChainDto
 import com.rajotiyapawan.pokedex.data.remote.dto.FlavourEntryDto
 import com.rajotiyapawan.pokedex.data.remote.dto.NameUrlDto
@@ -13,6 +14,7 @@ import com.rajotiyapawan.pokedex.data.remote.dto.StatsDto
 import com.rajotiyapawan.pokedex.domain.model.Ability
 import com.rajotiyapawan.pokedex.domain.model.AbilityDetails
 import com.rajotiyapawan.pokedex.domain.model.Chain
+import com.rajotiyapawan.pokedex.domain.model.EggGroupDetail
 import com.rajotiyapawan.pokedex.domain.model.EvolutionChain
 import com.rajotiyapawan.pokedex.domain.model.EvolutionDetail
 import com.rajotiyapawan.pokedex.domain.model.FlavourEntry
@@ -106,19 +108,26 @@ fun PokemonDataDto.toBasicInfo(): PokemonBasicInfo {
 
 fun AbilityDetailDto.toDomain(): AbilityDetails {
     return AbilityDetails(
-        effect_entries = effect_entries.map { it.toDomain() }.toList(),
-        flavor_text_entries = flavor_text_entries.map { it.toDomain() }.toList()
+        effectEntries = effectEntries.map { it.toDomain() }.toList(),
+        flavorTextEntries = flavorTextEntries.map { it.toDomain() }.toList(),
+        pokemon = pokemon.map { it.toDomain() }.toList()
     )
 }
 
 fun AbilityDetailDto.AbilityEffectDto.toDomain(): AbilityDetails.AbilityEffect {
     return AbilityDetails.AbilityEffect(
-        effect, short_effect, flavor_text, language?.toDomain()
+        effect, shortEffect, flavorText, language?.toDomain(), null
     )
 }
 
 fun FlavourEntryDto.toDomain(): FlavourEntry {
     return FlavourEntry(flavor_text, language.toDomain(), version?.toDomain(), version_group.toDomain())
+}
+
+fun AbilityDetailDto.AbilityHoldersDto.toDomain(): AbilityDetails.AbilityHolders {
+    return AbilityDetails.AbilityHolders(
+        isHidden, pokemon.toDomain(), slot
+    )
 }
 
 fun EvolutionChainDto.toDomain(
@@ -168,5 +177,13 @@ fun EvolutionChainDto.EvolutionDetailDto.toDomain(): EvolutionDetail {
         partySpecies = partySpecies?.toDomain(),
         partyType = partyType?.toDomain(),
         relativePhysicalStats = relativePhysicalStats
+    )
+}
+
+fun EggGroupDetailDto.toDomain(): EggGroupDetail {
+    return EggGroupDetail(
+        id = id,
+        name = name,
+        pokemonSpecies = pokemonSpecies.map { it.toDomain() }.toList()
     )
 }

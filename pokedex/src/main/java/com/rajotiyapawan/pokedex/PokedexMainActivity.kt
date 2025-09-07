@@ -25,6 +25,8 @@ import androidx.navigation.navArgument
 import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
 import com.rajotiyapawan.pokedex.presentation.navigation.Routes
+import com.rajotiyapawan.pokedex.presentation.ui.AbilityListScreen
+import com.rajotiyapawan.pokedex.presentation.ui.EggGroupListScreen
 import com.rajotiyapawan.pokedex.presentation.ui.PokedexMainScreen
 import com.rajotiyapawan.pokedex.presentation.ui.PokemonDetailScreen
 import com.rajotiyapawan.pokedex.presentation.ui.theme.ModuleActivityTheme
@@ -112,13 +114,57 @@ class PokedexMainActivity : ComponentActivity() {
                 PokemonDetailScreen(Modifier.fillMaxSize(), NameUrlItem(name = pokemon), viewModel)
             }
 
+            composable(
+                route = Routes.AbilityList.route,
+                arguments = listOf(
+                    navArgument("abilityName") { type = NavType.StringType },
+                ),
+                enterTransition = {
+                    slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
+                },
+                exitTransition = {
+                    slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut()
+                },
+                popEnterTransition = {
+                    slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn()
+                },
+                popExitTransition = {
+                    slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
+                }) { backStackEntry ->
+                val abilityName = backStackEntry.arguments?.getString("abilityName") ?: return@composable
+                AbilityListScreen(Modifier.fillMaxSize(), abilityName, viewModel)
+            }
+
+            composable(
+                route = Routes.EggGroupList.route,
+                arguments = listOf(
+                    navArgument("eggGroupName") { type = NavType.StringType },
+                ),
+                enterTransition = {
+                    slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
+                },
+                exitTransition = {
+                    slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut()
+                },
+                popEnterTransition = {
+                    slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn()
+                },
+                popExitTransition = {
+                    slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
+                }) { backStackEntry ->
+                val eggGroup = backStackEntry.arguments?.getString("eggGroupName") ?: return@composable
+                EggGroupListScreen(Modifier.fillMaxSize(), eggGroup, viewModel)
+            }
+
         }
     }
 
     private fun handleUserEvents(navController: NavHostController, event: PokedexUserEvent) {
         when (event) {
             PokedexUserEvent.BackBtnClicked -> navController.popBackStack()
-            is PokedexUserEvent.OpenDetail -> navController.navigate(Routes.Detail.createRoute(event.poekmon))
+            is PokedexUserEvent.OpenDetail -> navController.navigate(Routes.Detail.createRoute(event.pokemon))
+            is PokedexUserEvent.OpenAbilityList -> navController.navigate(Routes.AbilityList.createRoute(event.abilityName))
+            is PokedexUserEvent.OpenEggGroupList -> navController.navigate(Routes.EggGroupList.createRoute(event.eggGroup))
         }
     }
 }

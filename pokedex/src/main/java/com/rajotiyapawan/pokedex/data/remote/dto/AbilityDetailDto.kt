@@ -1,25 +1,27 @@
 package com.rajotiyapawan.pokedex.data.remote.dto
 
+import com.google.gson.annotations.SerializedName
+
 /**
  * Created by Pawan Rajotiya on 05-09-2025.
  */
 data class AbilityDetailDto(
-    val effect_entries: List<AbilityEffectDto>,
-    val flavor_text_entries: List<FlavourEntryDto>,
-    val is_main_series: Boolean,
+    @SerializedName("effect_entries") val effectEntries: List<AbilityEffectDto>,
+    @SerializedName("flavor_text_entries") val flavorTextEntries: List<FlavourEntryDto>,
+    @SerializedName("is_main_series") val isMainSeries: Boolean,
     val id: Int,
     val name: String,
-    val pokemon: List<AbilityHolders>
+    val pokemon: List<AbilityHoldersDto>
 ) {
     data class AbilityEffectDto(
         val effect: String,
-        val short_effect: String,
-        val flavor_text: String?,
+        @SerializedName("short_effect") val shortEffect: String,
+        @SerializedName("flavor_text") val flavorText: String?,
         val language: NameUrlDto?
     )
 
-    data class AbilityHolders(
-        val is_hiddern: Boolean,
+    data class AbilityHoldersDto(
+        @SerializedName("is_hidden") val isHidden: Boolean,
         val pokemon: NameUrlDto,
         val slot: Int
     )

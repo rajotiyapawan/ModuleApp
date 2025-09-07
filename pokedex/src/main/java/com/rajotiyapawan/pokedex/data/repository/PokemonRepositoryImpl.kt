@@ -6,11 +6,13 @@ import com.rajotiyapawan.network.POKE_BaseUrl
 import com.rajotiyapawan.pokedex.data.mapper.toBasicInfo
 import com.rajotiyapawan.pokedex.data.mapper.toDomain
 import com.rajotiyapawan.pokedex.data.remote.dto.AbilityDetailDto
+import com.rajotiyapawan.pokedex.data.remote.dto.EggGroupDetailDto
 import com.rajotiyapawan.pokedex.data.remote.dto.EvolutionChainDto
 import com.rajotiyapawan.pokedex.data.remote.dto.PokemonDataDto
 import com.rajotiyapawan.pokedex.data.remote.dto.PokemonListDto
 import com.rajotiyapawan.pokedex.data.remote.dto.PokemonSpeciesDataDto
 import com.rajotiyapawan.pokedex.domain.model.AbilityDetails
+import com.rajotiyapawan.pokedex.domain.model.EggGroupDetail
 import com.rajotiyapawan.pokedex.domain.model.EvolutionChain
 import com.rajotiyapawan.pokedex.domain.model.PokemonBasicInfo
 import com.rajotiyapawan.pokedex.domain.model.PokemonData
@@ -125,6 +127,14 @@ class PokemonRepositoryImpl : PokemonRepository {
             speciesPairs.addAll(collect(it))
         }
         return speciesPairs
+    }
+
+    override fun getEggGroupPokemonList(params: RequestModel): Flow<ApiResponse<EggGroupDetail>> = flow {
+        val response = NetworkRepository.getCall<EggGroupDetailDto>(POKE_BaseUrl + "egg-group/" + params.name)
+        when (response) {
+            is ApiResponse.Error -> emit(response)
+            is ApiResponse.Success -> emit(ApiResponse.Success(response.data.toDomain()))
+        }
     }
 
 }

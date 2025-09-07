@@ -18,6 +18,7 @@ import com.rajotiyapawan.pokedex.domain.model.PokemonListData
 import com.rajotiyapawan.pokedex.domain.model.PokemonSpeciesData
 import com.rajotiyapawan.pokedex.domain.model.RequestModel
 import com.rajotiyapawan.pokedex.domain.usecase.GetAbilityDetailsUseCase
+import com.rajotiyapawan.pokedex.domain.usecase.GetEggGroupPokemonListUseCase
 import com.rajotiyapawan.pokedex.domain.usecase.GetEvolutionChainDetailsUseCase
 import com.rajotiyapawan.pokedex.domain.usecase.GetPokemonBasicInfoUseCase
 import com.rajotiyapawan.pokedex.domain.usecase.GetPokemonDetailsUseCase
@@ -43,7 +44,8 @@ class PokeViewModel(
     private val getPokemonSpeciesDataUseCase: GetPokemonSpeciesDataUseCase,
     private val getPokemonBasicInfoUseCase: GetPokemonBasicInfoUseCase,
     private val getAbilityDetailsUseCase: GetAbilityDetailsUseCase,
-    private val getEvolutionChainDetailsUseCase: GetEvolutionChainDetailsUseCase
+    private val getEvolutionChainDetailsUseCase: GetEvolutionChainDetailsUseCase,
+    private val getEggGroupPokemonListUseCase: GetEggGroupPokemonListUseCase
 ) : ViewModel() {
 
     companion object {
@@ -56,11 +58,13 @@ class PokeViewModel(
                 val getPokemonBasicInfoUseCase = GetPokemonBasicInfoUseCase(pokeRepo)
                 val getAbilityDetailsUseCase = GetAbilityDetailsUseCase(pokeRepo)
                 val getEvolutionChainDetailsUseCase = GetEvolutionChainDetailsUseCase(pokeRepo)
+                val getEggGroupPokemonListUseCase = GetEggGroupPokemonListUseCase(pokeRepo)
                 return@initializer PokeViewModel(
                     getPokemonListUseCase,
                     getPokemonDetailsUseCase,
                     getPokemonSpeciesDataUseCase,
-                    getPokemonBasicInfoUseCase, getAbilityDetailsUseCase, getEvolutionChainDetailsUseCase
+                    getPokemonBasicInfoUseCase, getAbilityDetailsUseCase, getEvolutionChainDetailsUseCase,
+                    getEggGroupPokemonListUseCase
                 )
             }
         }
@@ -184,7 +188,11 @@ class PokeViewModel(
 
                     is ApiResponse.Success -> {
                         item.name?.let { name ->
-                            _pokemonDetails[name] = it.data
+                            if (it.data.types.isNotEmpty() && it.data.imageUrl.isNotEmpty()) {
+                                _pokemonDetails[name] = it.data
+                            } else {
+                                Log.e("FetchError", "Failed for ${item.name}: didn't get complete details.")
+                            }
                         }
                     }
                 }
@@ -224,17 +232,18 @@ class PokeViewModel(
                         val detail = response.data
                         item?.name?.let { name ->
                             _abilityDetails[name] = AbilityEffect(
-                                effect = detail.effect_entries
+                                effect = detail.effectEntries
                                     .firstOrNull { it.language?.name == "en" && it.effect.isNotBlank() }
                                     ?.effect ?: "",
-                                short_effect = detail.effect_entries
-                                    .firstOrNull { it.language?.name == "en" && it.short_effect.isNotBlank() }
-                                    ?.short_effect ?: "",
-                                flavor_text = detail.flavor_text_entries
+                                shortEffect = detail.effectEntries
+                                    .firstOrNull { it.language?.name == "en" && it.shortEffect.isNotBlank() }
+                                    ?.shortEffect ?: "",
+                                flavorText = detail.flavorTextEntries
                                     .lastOrNull { it.language.name == "en" }
                                     ?.flavor_text
                                     ?.replace("\n", " ") ?: "",
-                                language = NameUrlItem("", "")
+                                language = NameUrlItem("", ""),
+                                pokemon = detail.pokemon
                             )
                         }
                     }
@@ -266,6 +275,20 @@ class PokeViewModel(
         }
     }
 
+    private val _eggGroupPokemonList = MutableStateFlow<List<NameUrlItem>>(emptyList())
+    val eggGroupPokemonList = _eggGroupPokemonList.asStateFlow()
+    fun getEggGroupPokemonList(item: NameUrlItem?) {
+        viewModelScope.launch {
+            getEggGroupPokemonListUseCase.invoke(RequestModel(name = item?.name, url = item?.url)).collectLatest {
+                when (it) {
+                    is ApiResponse.Error -> Log.e("FetchError", "Failed for ${item?.name}: ${it.message}")
+                    is ApiResponse.Success -> {
+                        _eggGroupPokemonList.value = it.data.pokemonSpecies
+                    }
+                }
+            }
+        }
+    }
 
     fun toggleFavourites(item: NameUrlItem) {
         Log.e("Favourites", "Favourite icon clicked - ${item.name}")

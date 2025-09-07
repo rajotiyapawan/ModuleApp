@@ -2,7 +2,9 @@ package com.rajotiyapawan.pokedex.presentation.ui.detail_screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,11 +13,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rajotiyapawan.pokedex.utility.getFontFamily
+import com.rajotiyapawan.pokedex.utility.noRippleClick
 
 @Composable
 fun DetailCardWithTitle(modifier: Modifier = Modifier, title: String, color: Color, content: @Composable (() -> Unit)) {
@@ -47,5 +51,16 @@ fun DetailCardWithTitle(modifier: Modifier = Modifier, title: String, color: Col
                 lineHeight = 16.sp
             )
         }
+    }
+}
+
+@Composable
+fun ShowListButton(modifier: Modifier = Modifier, onShowListClick: () -> Unit) {
+    Row(
+        modifier = modifier
+            .noRippleClick { onShowListClick() }
+            .background(brush = Brush.linearGradient(colors = listOf(Color(0xFF66BB6A), Color(0xFF26A69A), Color(0xFF29B6F6))), shape = RoundedCornerShape(50))
+            .padding(vertical = 8.dp), horizontalArrangement = Arrangement.Center) {
+        Text("Pokemon List", fontFamily = getFontFamily(weight = FontWeight.Bold), color = Color.White)
     }
 }

@@ -7,6 +7,6 @@ import com.google.gson.annotations.SerializedName
  */
 data class AbilityDto(
     @SerializedName("ability") var ability: NameUrlDto? = null,
-    @SerializedName("is_hidden") var isHidden: Boolean? = null,
+    @SerializedName("isHidden") var isHidden: Boolean? = null,
     @SerializedName("slot") var slot: Int? = null
 )
