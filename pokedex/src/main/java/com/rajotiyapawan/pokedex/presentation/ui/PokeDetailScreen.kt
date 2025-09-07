@@ -67,7 +67,7 @@ import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.UiState
 import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
 import com.rajotiyapawan.pokedex.utility.getFontFamily
-import com.rajotiyapawan.pokedex.utility.getTypeColor
+import com.rajotiyapawan.pokedex.utility.getTypeIconColor
 import com.rajotiyapawan.pokedex.utility.noRippleClick
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -117,7 +117,7 @@ private fun DetailMainUI(modifier: Modifier = Modifier, viewModel: PokeViewModel
     val width = remember { mutableStateOf(0) }
     val height = LocalConfiguration.current.screenHeightDp
 
-    val typeColors = data.types.map { getTypeColor(it) }
+    val typeColors = data.types.map { getTypeIconColor(it) }
 
     Scaffold { padding ->
         Box(

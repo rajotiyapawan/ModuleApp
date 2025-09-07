@@ -37,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -53,10 +52,11 @@ import coil.size.Size
 import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
 import com.rajotiyapawan.pokedex.model.PokedexUserEvent
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
+import com.rajotiyapawan.pokedex.utility.TypeIcon
 import com.rajotiyapawan.pokedex.utility.UiState
 import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
 import com.rajotiyapawan.pokedex.utility.getFontFamily
-import com.rajotiyapawan.pokedex.utility.getTypeColor
+import com.rajotiyapawan.pokedex.utility.getTypeIconColor
 import com.rajotiyapawan.pokedex.utility.noRippleClick
 import java.util.Locale
 
@@ -197,14 +197,13 @@ private fun PokemonListItem(
     }
     Log.d("PokemonUI", "Composing ${item.name} | detail loaded = ${detail != null}")
 
-    val typeColors = detail?.types?.map { getTypeColor(it) } ?: listOf()
+    val typeColors = detail?.types?.map { getTypeIconColor(it) } ?: listOf()
     val gradientBrush = remember(detail?.types) {
         when (typeColors.size) {
             1 -> {
                 val base = typeColors[0]
-                val darker = Color.Black.copy(alpha = 0.3f).compositeOver(base.copy(alpha = 1f)) // Slight dark blend
                 Brush.linearGradient(
-                    colors = listOf(base.copy(alpha = 0.8f), darker),
+                    colors = listOf(base.copy(alpha = 0.4f), base),
                     start = Offset.Zero,
                     end = Offset(width * 3.6f, 0f)
                 )
@@ -235,10 +234,10 @@ private fun PokemonListItem(
             .noRippleClick {
                 itemSelected()
             }
-            .padding(vertical = 12.dp, horizontal = 8.dp)
+            .padding(vertical = 5.dp, horizontal = 8.dp)
     ) {
         if (detail != null) {
-            Box(Modifier.size(56.dp)) {
+            Box(Modifier.size(80.dp)) {
                 val request = ImageRequest.Builder(context)
                     .data(detail.imageUrl) // must be the high-res artwork URL
                     .crossfade(true)
@@ -251,13 +250,20 @@ private fun PokemonListItem(
                 )
             }
         } else {
-            Box(Modifier.size(56.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(80.dp), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp))
             }
         }
         Column(Modifier.padding(start = 8.dp)) {
-            Text((item.name ?: "").capitalizeFirstChar(), fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 18.sp)
-            Text(text = detail?.types?.joinToString(", ", transform = { it.name.lowercase().capitalizeFirstChar() }) ?: "")
+            Text(
+                (item.name ?: "").capitalizeFirstChar(),
+                fontFamily = getFontFamily(weight = FontWeight.Bold), fontSize = 24.sp, color = Color.White
+            )
+            Row(modifier = Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                detail?.types?.forEach {
+                    TypeIcon(type = it, withText = false)
+                }
+            }
         }
         val id = detail?.id ?: 0
         val formatted = if (id < 1000) {
@@ -266,9 +272,9 @@ private fun PokemonListItem(
             id.toString()
         }
         Spacer(Modifier.weight(1f))
-        Column(horizontalAlignment = Alignment.End) {
-            Icon(Icons.Default.FavoriteBorder, contentDescription = null)
-            Text("#$formatted", fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 20.sp)
+        Column(modifier = Modifier.height(80.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.SpaceBetween) {
+            Icon(Icons.Default.FavoriteBorder, contentDescription = null, tint = Color.White)
+            Text("#$formatted", fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 30.sp, color = Color.White)
         }
     }
 }

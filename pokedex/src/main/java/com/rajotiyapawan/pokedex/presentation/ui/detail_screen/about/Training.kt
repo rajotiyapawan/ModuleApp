@@ -69,8 +69,8 @@ private fun TrainingItem(modifier: Modifier, itemName: String, items: List<Strin
                 .padding(end = 8.dp),
             fontWeight = FontWeight.Bold, textAlign = TextAlign.Start,
             fontFamily = getFontFamily(),
-            fontSize = 12.sp,
-            lineHeight = 13.sp
+            fontSize = 14.sp,
+            lineHeight = 16.sp
         )
         Column(Modifier.weight(1f)) {
             items.forEach {
@@ -78,8 +78,8 @@ private fun TrainingItem(modifier: Modifier, itemName: String, items: List<Strin
                     text = it,
                     textAlign = TextAlign.Start,
                     fontFamily = getFontFamily(),
-                    fontSize = 12.sp,
-                    lineHeight = 13.sp
+                    fontSize = 14.sp,
+                    lineHeight = 16.sp
                 )
             }
         }

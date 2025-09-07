@@ -25,7 +25,7 @@ fun DetailCardWithTitle(modifier: Modifier = Modifier, title: String, color: Col
         Surface(
             Modifier
                 .fillMaxWidth()
-                .padding(top = 6.dp)
+                .padding(top = 12.dp)
                 .padding(4.dp),
             color = Color.White,
             shape = RoundedCornerShape(12.dp),
@@ -37,13 +37,13 @@ fun DetailCardWithTitle(modifier: Modifier = Modifier, title: String, color: Col
             Modifier
                 .border(width = 1.dp, color = color, shape = RoundedCornerShape(50))
                 .background(color = Color.White, shape = RoundedCornerShape(50))
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = 12.dp, vertical = 5.dp)
         ) {
             Text(
                 title,
                 color = color,
-                fontFamily = getFontFamily(weight = FontWeight.SemiBold),
-                fontSize = 14.sp,
+                fontFamily = getFontFamily(weight = FontWeight.Bold),
+                fontSize = 15.sp,
                 lineHeight = 16.sp
             )
         }

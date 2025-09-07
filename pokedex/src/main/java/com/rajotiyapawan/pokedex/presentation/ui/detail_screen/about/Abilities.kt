@@ -1,7 +1,6 @@
 package com.rajotiyapawan.pokedex.presentation.ui.detail_screen.about
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +16,6 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -59,15 +57,15 @@ fun AboutAbilities(
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(top = 4.dp)
+                .padding(top = 8.dp)
                 .padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 stringResource(R.string.ability_intro),
                 color = Color.Black,
                 fontFamily = getFontFamily(),
-                fontSize = 12.sp,
-                lineHeight = 13.sp
+                fontSize = 14.sp,
+                lineHeight = 16.sp,
             )
             Spacer(Modifier.height(18.dp))
             abilities.forEach { ability ->
@@ -79,7 +77,7 @@ fun AboutAbilities(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(color = color.copy(alpha = 0.2f), shape = RoundedCornerShape(4.dp))
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
                     abilityName = ability.ability?.name ?: "",
                     isHidden = ability.isHidden,
                     description = detail?.flavor_text ?: "",
@@ -120,17 +118,17 @@ private fun AbilityItem(
             Text(
                 abilityName.capitalizeFirstChar(),
                 color = color,
-                fontFamily = getFontFamily(weight = FontWeight.SemiBold),
-                fontSize = 12.sp,
-                lineHeight = 13.sp
+                fontFamily = getFontFamily(weight = FontWeight.Bold),
+                fontSize = 14.sp,
+                lineHeight = 16.sp
             )
             if (isHidden) {
                 Text(
                     " - Hidden",
-                    color = color.copy(alpha = 0.5f),
-                    fontFamily = getFontFamily(weight = FontWeight.SemiBold),
-                    fontSize = 12.sp,
-                    lineHeight = 13.sp
+                    color = color.copy(alpha = 0.7f),
+                    fontFamily = getFontFamily(weight = FontWeight.Bold),
+                    fontSize = 14.sp,
+                    lineHeight = 16.sp
                 )
 
             }
@@ -141,7 +139,7 @@ private fun AbilityItem(
                 .noRippleClick { onInfoClick() })
     }
     Spacer(Modifier.height(8.dp))
-    Text(description, modifier = Modifier.fillMaxWidth(), fontSize = 12.sp, lineHeight = 13.sp)
+    Text(description, modifier = Modifier.fillMaxWidth(), fontSize = 14.sp, lineHeight = 16.sp)
     Spacer(Modifier.height(16.dp))
 }
 
@@ -155,49 +153,33 @@ private fun AbilitiesDialogUI(modifier: Modifier = Modifier, title: String, deta
             fontSize = 10.sp,
             lineHeight = 11.sp
         )
-        Text(title.capitalizeFirstChar(), fontFamily = getFontFamily(weight = FontWeight.SemiBold))
+        Text(
+            title.capitalizeFirstChar(), fontFamily = getFontFamily(weight = FontWeight.Bold),
+            fontSize = 24.sp
+        )
         Box(
             modifier
                 .fillMaxWidth()
                 .padding(16.dp), contentAlignment = Alignment.TopCenter
         ) {
-            Surface(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 6.dp)
-                    .padding(4.dp),
-                color = Color.White,
-                shape = RoundedCornerShape(12.dp),
-                shadowElevation = 4.dp
-            ) {
+            DetailCardWithTitle(title = "Details", color = color) {
                 Column(
                     Modifier
                         .fillMaxWidth()
                         .padding(top = 20.dp, start = 16.dp, end = 16.dp, bottom = 20.dp)
                 ) {
-                    Text("Description", fontFamily = getFontFamily(weight = FontWeight.SemiBold))
-                    Text(detail?.flavor_text ?: "", fontSize = 12.sp, lineHeight = 13.sp)
+                    Text("Description", fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 20.sp, lineHeight = 24.sp)
+                    Spacer(Modifier.height(8.dp))
+                    Text(detail?.flavor_text ?: "", fontSize = 14.sp, lineHeight = 16.sp)
                     Spacer(Modifier.height(16.dp))
-                    Text("Effect", fontFamily = getFontFamily(weight = FontWeight.SemiBold))
-                    Text(detail?.short_effect ?: "", fontSize = 12.sp, lineHeight = 13.sp)
+                    Text("Effect", fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 20.sp, lineHeight = 24.sp)
+                    Spacer(Modifier.height(8.dp))
+                    Text(detail?.short_effect ?: "", fontSize = 14.sp, lineHeight = 16.sp)
                     Spacer(Modifier.height(16.dp))
-                    Text("Details", fontFamily = getFontFamily(weight = FontWeight.SemiBold))
-                    Text(detail?.effect ?: "", fontSize = 12.sp, lineHeight = 13.sp)
+                    Text("Details", fontFamily = getFontFamily(weight = FontWeight.SemiBold), fontSize = 20.sp, lineHeight = 24.sp)
+                    Spacer(Modifier.height(8.dp))
+                    Text(detail?.effect ?: "", fontSize = 14.sp, lineHeight = 16.sp)
                 }
-            }
-            Box(
-                Modifier
-                    .border(width = 1.dp, color = color, shape = RoundedCornerShape(50))
-                    .background(color = Color.White, shape = RoundedCornerShape(50))
-                    .padding(horizontal = 12.dp)
-            ) {
-                Text(
-                    "Details",
-                    color = color,
-                    fontFamily = getFontFamily(weight = FontWeight.SemiBold),
-                    fontSize = 14.sp,
-                    lineHeight = 16.sp
-                )
             }
         }
     }

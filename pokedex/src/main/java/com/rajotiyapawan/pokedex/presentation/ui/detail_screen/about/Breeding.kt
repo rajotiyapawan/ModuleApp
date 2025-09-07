@@ -1,17 +1,21 @@
 package com.rajotiyapawan.pokedex.presentation.ui.detail_screen.about
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -30,11 +34,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rajotiyapawan.pokedex.domain.model.NameUrlItem
 import com.rajotiyapawan.pokedex.presentation.ui.detail_screen.DetailCardWithTitle
 import com.rajotiyapawan.pokedex.presentation.viewmodel.PokeViewModel
 import com.rajotiyapawan.pokedex.utility.capitalizeFirstChar
+import com.rajotiyapawan.pokedex.utility.getEggGroupColor
 import com.rajotiyapawan.pokedex.utility.getFontFamily
-import com.rajotiyapawan.pokedex.utility.noRippleClick
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,46 +58,38 @@ fun AboutBreeding(modifier: Modifier = Modifier, color: Color, viewModel: PokeVi
                 text = "Egg groups:",
                 fontWeight = FontWeight.Bold, textAlign = TextAlign.Start,
                 fontFamily = getFontFamily(),
-                fontSize = 12.sp,
-                lineHeight = 13.sp
+                fontSize = 14.sp,
+                lineHeight = 16.sp
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 aboutData.eggGroups?.forEach {
-                    Row(
-                        Modifier
-                            .weight(1f)
-                            .background(color, shape = RoundedCornerShape(8.dp))
-                            .padding(horizontal = 5.dp, vertical = 3.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "${it.name?.capitalizeFirstChar()}",
-                            fontWeight = FontWeight.Bold, textAlign = TextAlign.Start,
-                            fontFamily = getFontFamily(),
-                            fontSize = 12.sp,
-                            lineHeight = 13.sp
-                        )
-                        Icon(Icons.Outlined.Info, contentDescription = null, tint = Color.Black, modifier = Modifier.noRippleClick { showAbilityDescription = it.name ?: "" })
-                    }
+                    EggGroupItem(Modifier.weight(1f), it) { showAbilityDescription = it.name ?: "" }
                 }
             }
+            Spacer(Modifier.height(8.dp))
             Text(
                 text = "Egg cycles:",
                 fontWeight = FontWeight.Bold, textAlign = TextAlign.Start,
                 fontFamily = getFontFamily(),
-                fontSize = 12.sp,
-                lineHeight = 13.sp
+                fontSize = 14.sp,
+                lineHeight = 16.sp
             )
+            Spacer(Modifier.height(8.dp))
             Text(
                 text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold, fontSize = 18.sp)) {
                         append("${aboutData.hatchCounter} ")
                     }
-                    append("(${aboutData.hatchCounter * 256} Steps)")
+                    append(" (${aboutData.hatchCounter * 256} Steps)")
                 },
                 textAlign = TextAlign.Start,
                 fontFamily = getFontFamily(),
-                fontSize = 12.sp,
-                lineHeight = 13.sp
+                fontSize = 14.sp,
+                lineHeight = 16.sp
             )
 
         }
@@ -104,6 +101,39 @@ fun AboutBreeding(modifier: Modifier = Modifier, color: Color, viewModel: PokeVi
             containerColor = Color(0xfff5f5f5)
         ) {
             Text("Show pokemon list for this egg group")
+        }
+    }
+}
+
+@Composable
+private fun EggGroupItem(modifier: Modifier = Modifier, eggGroup: NameUrlItem, onInfoClick: () -> Unit) {
+    val color = getEggGroupColor(eggGroup.name ?: "")
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        color = color.copy(alpha = 0.2f),
+        tonalElevation = 2.dp
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.padding(horizontal = 5.dp, vertical = 3.dp)
+        ) {
+            Text(
+                text = (eggGroup.name ?: "").capitalizeFirstChar(),
+                fontFamily = getFontFamily(weight = FontWeight.SemiBold),
+                fontSize = 14.sp, lineHeight = 16.sp,
+                color = color
+            )
+            IconButton(
+                onClick = onInfoClick,
+                modifier = Modifier.size(20.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Info, modifier = Modifier.size(16.dp),
+                    contentDescription = "Info",
+                    tint = color
+                )
+            }
         }
     }
 }

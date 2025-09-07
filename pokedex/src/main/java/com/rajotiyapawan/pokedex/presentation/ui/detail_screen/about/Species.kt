@@ -48,35 +48,35 @@ fun AboutSpecies(
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(top = 4.dp)
+                .padding(top = 8.dp)
                 .padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 aboutData.genus,
                 fontFamily = getFontFamily(weight = FontWeight.SemiBold),
                 color = Color.Black,
-                fontSize = 15.sp
+                fontSize = 16.sp
             )
             Text(
                 aboutData.flavourText,
                 fontFamily = getFontFamily(),
                 color = Color.Black,
-                fontSize = 12.sp,
-                lineHeight = 13.sp
+                fontSize = 14.sp,
+                lineHeight = 16.sp,
+                textAlign = TextAlign.Center
             )
 
             // pokemon types
             AboutPokemonTypes(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp), types = data.types, color = color
+                    .padding(vertical = 20.dp), types = data.types
             )
 
             // body measurements
             AboutBodyMeasurements(
                 Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
+                    .fillMaxWidth(),
                 data.height,
                 data.weight,
                 malePercentage = aboutData.malePercentage,
@@ -87,10 +87,10 @@ fun AboutSpecies(
 }
 
 @Composable
-private fun AboutPokemonTypes(modifier: Modifier = Modifier, types: List<PokeType>?, color: List<Color>) {
+private fun AboutPokemonTypes(modifier: Modifier = Modifier, types: List<PokeType>?) {
     Row(modifier, horizontalArrangement = Arrangement.Center) {
-        types?.forEachIndexed { index, type ->
-            TypeIcon(type, Modifier.padding(horizontal = 4.dp))
+        types?.forEach { type ->
+            TypeIcon(Modifier.padding(horizontal = 4.dp), type)
         }
     }
 }
