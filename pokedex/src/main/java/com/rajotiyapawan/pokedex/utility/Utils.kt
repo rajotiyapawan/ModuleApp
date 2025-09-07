@@ -207,16 +207,16 @@ fun TypeIcon(modifier: Modifier = Modifier, type: PokeType, withText: Boolean = 
 fun getEggGroupColor(name: String): Color {
     return when (name.lowercase()) {
         "monster" -> Color(0xFF6B4226)
-        "water1", "water2", "water3" -> Color(0xFF1E90FF)
-        "bug" -> Color(0xFF7CFC00)
-        "flying" -> Color(0xFF87CEEB)
-        "fairy" -> Color(0xFFFFB6C1)
+        "water1", "water2", "water3" -> Color(0xff549DDF)
+        "bug" -> Color(0xff92BC2C)
+        "flying" -> Color(0xffA1BBEC)
+        "fairy" -> Color(0xffEF90E5)
         "human-like" -> Color(0xFFDA70D6)
         "mineral" -> Color(0xFF808080)
         "ditto" -> Color(0xFFBA55D3)
-        "dragon" -> Color(0xFF8B0000)
+        "dragon" -> Color(0xff0C69C7)
         "undiscovered" -> Color(0xFFA9A9A9)
-        "plant" -> Color(0xFF7AC74C)
+        "plant" -> Color(0xff60BD58)
         else -> Color.Gray
     }
 }
